@@ -4,15 +4,31 @@
     box-sizing: border-box;
 }
 body{
+    background: green;
+     background-image: url("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQBcliz5VjGqI88McmwPkb2yimH2qqeielt-6AzhApCZzgfMQIr");
+}
+/*
+body{
     width: 100vw;
     height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
 
-}
-/*
-.CanvasContainer{
-    width: 75vw;
-    height: 85vh;
 }*/
+.hidden{
+    display: none;
+}
+
+canvas{
+    background: none;
+}
+.CanvasContainer{
+    position: relative;
+
+}
+#cantwo{
+    z-index: 33;
+    position: absolute;
+
+}
