@@ -95,11 +95,17 @@ function startPos(e){
 
     painting = true;
     drawing=[]
+    //c.moveTo(e.clientX,e.clientY)
     c.beginPath()
 }
-function endPos(){
+function endPos(e){
+
     stuff.push(drawing)
+
     drawing=[]
+    //e.moveTo(e.clientX,e.clientY)
+    //c.closePath()
+    prevPos=[]
     
     painting = false;
 }
@@ -140,24 +146,42 @@ for(let i =0;i < canvas.width;i++){
 }
 
 /* Keep this as example? */
+let prevPos
+
 function draw(e){
     //console.log(drawing)
     //console.log(e.clientX,e.clientY)
 
     if(!painting) return;
+    if(!prevPos ){
+        prevPos= [e.clientX,e.clientY]
+        return
+    }
     drawing.push([e.clientX+30,e.clientY+30])
     if(  e.clientY >canvas.width/2&&( e.clientY >3*e.clientX-canvas.width && e.clientY> -3*e.clientX+(dim/2+(3*dim/2)))){
         c.lineWidth = 1;
         c.lineCap = 'round';
         //debugger
+        c.beginPath()
+        c.moveTo(prevPos[0],prevPos[1])
+        //c.moveTo(e.clientX, e.clientY)
         c.lineTo(e.clientX, e.clientY)
+        c.closePath()
         c.stroke()
-        c.moveTo(e.clientX, e.clientY)
+
+        c.beginPath()
+        c.moveTo(prevPos[0]+3, prevPos[1]+3)
+        c.lineTo(e.clientX+3, e.clientY+3)
+        c.closePath()
+        c.stroke()
+        prevPos=[ e.clientX, e.clientY ]
     }else{
         c.beginPath()
         
     }
 }
+//drawLine( )
+
 
 ///* Keep this as example? */
 //function draw(e){
