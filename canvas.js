@@ -1,4 +1,5 @@
 onload=()=>{
+
 //console.log('hi')
 let canvas = document.querySelector('#myCanvas')
 //console.log(canvas)
@@ -9,6 +10,7 @@ const dim=1203
 canvas.width =  dim
 canvas.height = dim
 const c = canvas.getContext('2d');
+//c.transform(1,0,0,1,dim/2,dim/2)
 
 cantwo = document.querySelector('#cantwo')
 cantwo.width =  dim
@@ -41,51 +43,6 @@ c.stroke();
 c.closePath();
 
 c.beginPath();
-//drawAngledLine(x,y,r,90)
-//drawAngledLine(x,y,-r,90)
-//function drawAngledLine(x, y, length, angle) {
-//    var radians = angle / 180 * Math.PI;
-//    var endX = x + length * Math.cos(radians);
-//    var endY = y - length * Math.sin(radians);
-//    c.beginPath();
-//    c.moveTo(x, y)
-//    c.lineTo(endX, endY);
-//    c.closePath();
-//    c.stroke();
-//}
-
-
-//function draw(e){
-//    if(!painting) return;
-//    c.lineWidth = 5;
-//    c.lineCap = 'round';
-//
-//    c.lineTo(e.clientX, e.clientY)
-//    c.stroke()
-//    c.beginPath()
-//    c.moveTo(e.clientX, e.clientY)
-//}
-//
-//function draw2(e){
-//    if(!painting) return;
-//    c.lineWidth = 5;
-//    c.lineCap = 'round';
-//
-//    c.lineTo(e.clientX+30, e.clientY)
-//    c.stroke()
-//    c.beginPath()
-//    c.moveTo(e.clientX+30, e.clientY)
-//}
-//lol=(e)=>{
-//    draw(e)
-//    draw2(e)
-//}
-//
-////EventListeners
-//canvas.addEventListener('mousedown', startPos)
-//canvas.addEventListener('mouseup', endPos)
-//canvas.addEventListener('mousemove', lol)
-//
 
 let painting =false
 let drawing=[]
@@ -148,6 +105,7 @@ for(let i =0;i < canvas.width;i++){
 /* Keep this as example? */
 let prevPos
 
+        //c.save()
 function draw(e){
     //console.log(drawing)
     //console.log(e.clientX,e.clientY)
@@ -168,12 +126,17 @@ function draw(e){
         c.lineTo(e.clientX, e.clientY)
         c.closePath()
         c.stroke()
+        c.save()
 
+        ///  this is the second stroke!
+        //c.transfrom(1,0,0,1,dim/2,dim/2)
+        c.transform(1,0,0,1,dim/9,dim/9)
         c.beginPath()
         c.moveTo(prevPos[0]+3, prevPos[1]+3)
         c.lineTo(e.clientX+3, e.clientY+3)
         c.closePath()
         c.stroke()
+        c.restore()
         prevPos=[ e.clientX, e.clientY ]
     }else{
         c.beginPath()
@@ -305,3 +268,50 @@ document.addEventListener('keydown',(e)=>{
 //canvas.addEventListener('keypress', testing())
 
 }
+
+
+//drawAngledLine(x,y,r,90)
+//drawAngledLine(x,y,-r,90)
+//function drawAngledLine(x, y, length, angle) {
+//    var radians = angle / 180 * Math.PI;
+//    var endX = x + length * Math.cos(radians);
+//    var endY = y - length * Math.sin(radians);
+//    c.beginPath();
+//    c.moveTo(x, y)
+//    c.lineTo(endX, endY);
+//    c.closePath();
+//    c.stroke();
+//}
+
+
+//function draw(e){
+//    if(!painting) return;
+//    c.lineWidth = 5;
+//    c.lineCap = 'round';
+//
+//    c.lineTo(e.clientX, e.clientY)
+//    c.stroke()
+//    c.beginPath()
+//    c.moveTo(e.clientX, e.clientY)
+//}
+//
+//function draw2(e){
+//    if(!painting) return;
+//    c.lineWidth = 5;
+//    c.lineCap = 'round';
+//
+//    c.lineTo(e.clientX+30, e.clientY)
+//    c.stroke()
+//    c.beginPath()
+//    c.moveTo(e.clientX+30, e.clientY)
+//}
+//lol=(e)=>{
+//    draw(e)
+//    draw2(e)
+//}
+//
+////EventListeners
+//canvas.addEventListener('mousedown', startPos)
+//canvas.addEventListener('mouseup', endPos)
+//canvas.addEventListener('mousemove', lol)
+//
