@@ -33,3 +33,7 @@ canvas{
     position: absolute;
 
 }
+
+.zoom{
+    zoom: 150%;
+}
