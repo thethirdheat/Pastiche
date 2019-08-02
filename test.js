@@ -194,3 +194,34 @@ console.log(v)
 
 console.log(v[0],'hi')
 console.log(v.size)
+
+
+
+
+/*mind mid*/
+class Cat {
+  constructor(name) {
+    this.name = name;
+  }
+
+  says(sound, person) {
+    console.log(`${this.name} says ${sound} to ${person}!`);
+    return true;
+  }
+}
+
+class Dog {
+  constructor(name) {
+    this.name = name;
+  }
+}
+
+const jet = new Cat("Jet");
+const pavlov = new Dog("Pavlov");
+
+
+const myBoundSays = jet.says.myBind(pavlov);
+const BoundSays = jet.says.bind(pavlov)
+
+myBoundSays("meow", "a tree"); // Pavlov says meow to a tree!
+BoundSays("meow", "a tree"); // Pavlov says meow to a tree!
