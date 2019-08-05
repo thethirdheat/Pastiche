@@ -1,4 +1,5 @@
 // leet code question 108
+
 //let sArBST = (ar)=>{
 //    let ret=[]
 //    const invMerg = (ar)=>{
@@ -220,8 +221,88 @@ const jet = new Cat("Jet");
 const pavlov = new Dog("Pavlov");
 
 
-const myBoundSays = jet.says.myBind(pavlov);
-const BoundSays = jet.says.bind(pavlov)
+///const myBoundSays = jet.says.myBind(pavlov);
+//const BoundSays = jet.says.bind(pavlov)
 
-myBoundSays("meow", "a tree"); // Pavlov says meow to a tree!
-BoundSays("meow", "a tree"); // Pavlov says meow to a tree!
+//myBoundSays("meow", "a tree"); // Pavlov says meow to a tree!
+//BoundSays("meow", "a tree"); // Pavlov says meow to a tree!
+
+
+/*
+ * Complete the function below.
+ phone number
+ */
+function letterCombinations(str) {
+    let alf={'2':["a","b","c"], '3':['d','e','f'],
+    '4':["g","h","i"], '5':['j','k','l'],
+    '6':["m","n","o"], '7':['p','q','r','s'],
+    '8':["t","u","v"], '9':['w','x','y','z']}
+   
+    if(str.length===0){
+        return [""]
+    }
+    let ret= []
+    for( let i = 0;i < str.length;i++){
+        if( alf[str[i]]){
+            for(let j=0;j<alf[str[i]].length;j++){
+                //console.log(alf[str[i]][j],'thsi is str[i]',str[i],str.slice(i+1))
+                if(1){
+
+                let oths=letterCombinations(str.slice(i+1))
+                //console.log(alf[str[i]][j],oths,'end')
+                //ret.push(oths.map(el=>`${alf[str[i]][j]}${el}`))
+                ret.push(oths.map(el=>alf[str[i]][j].concat(el)))
+                //return str[i][j].concat(letterCombinations(str.slice(i)))
+                }
+            }
+        }
+        
+    }
+    console.log(ret)
+    return ret
+}
+//letterCombinations('45')
+//console.log('wtf'.slice('wtf'.length),'hi')
+function TreeNode(val) {
+    this.val = val;
+    this.left = this.right = null;
+}
+
+
+let constructMaximumBinaryTree = function(nums) {
+    debugger
+    if(nums.length<1){
+        return null
+    }
+    
+    if(nums.length===1){
+        return new TreeNode(nums[0])
+    }
+    let max = nums[0]
+    let ind=0
+    for( let i =0;i < nums.length;i++){
+        if(nums[i]>max){
+            max=nums[i]
+            ind=i
+        }
+    }
+    
+    let rot = new TreeNode(nums[ind])
+
+    let l=nums.slice(0,ind)
+    let r=nums.slice(ind)
+    if(l.length){
+    console.log(ind,rot,l,r,'this is inda')
+        rot.left= constructMaximumBinaryTree(nums.slice(0,ind))
+    }
+    if(r.length){
+   // console.log(ind,rot,l,r,'this is inda')
+        rot.right= constructMaximumBinaryTree(nums.slice(ind+1))
+    }
+    return rot
+};
+console.log(constructMaximumBinaryTree([3,2,1,6,0,5]))
+nums=[1,2,3]
+ind=1
+//    console.log(nums.slice(0,ind))
+//    console.log(nums.slice(ind))
