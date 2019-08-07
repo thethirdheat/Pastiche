@@ -10,6 +10,7 @@ onload=()=>{
     let canvasRect = canvas.getBoundingClientRect();
 
     let prevPos=[0,0]
+    let currentCoord=[]
 
     function getCoords(e) {
         mouse.x = e.clientX || e.pageX || 0;
@@ -82,10 +83,10 @@ onload=()=>{
 
     let mult=1
     let screenToWorld=(ar)=>{
-        return [(ar[0]/mult)-totalPan[0],(ar[1]/mult)-totalPan[1]]
+        return [(ar[0]/scale)-totalPan[0]/scale,(ar[1]/scale)-totalPan[1]/scale]
     }
-    const transl=(ar)=>{
-        return [ar[0]-totalPan[0],ar[1]-totalPan[1]]
+    const worldToScreen=(ar)=>{
+        return [ar[0]/mult-totalPan[0],ar[1]/mult-totalPan[1]]
 
     }
 
@@ -98,7 +99,7 @@ onload=()=>{
             prevPos= [e.clientX,e.clientY]
             return
         }
-        console.log(window.offsetLeft)
+        //console.log(window.offsetLeft)
          //let screenCursor=[e.pageX-this.offsetLeft,e.pageY-this.offsetTop]
         //drawing.push([e.clientX-totalPan[0],e.clientY-totalPan[1]])
         //drawing.push([e.clientX-totalPan[0],e.clientY-totalPan[1]])
@@ -106,9 +107,14 @@ onload=()=>{
         //drawing.push([e.clientX/mult+totalPan[0]/mult,e.clientY/mult+totalPan[1]/mult])
 
 
-        //drawing.push([...screenToWorld([e.clientX,e.clientY])])
+        /*thi sis working */
+        //drawing.push([...screenToWorld([e.clientX/scale,e.clientY/scale])])
+        /*this */
+
+        drawing.push([...screenToWorld([e.clientX,e.clientY])])
+
         //drawing.push([e.clientX,e.clientY])
-        drawing.push(screenToWorld([e.clientX,e.clientY]))
+        //drawing.push(screenToWorld(worldToScreen([e.clientX,e.clientY])))
 
         //console.log(totalPan)
 //            if(true){
@@ -131,6 +137,7 @@ onload=()=>{
 
 
     const tool=(e)=>{
+        currentCoord=[e.clientX,e.clientY]
         if(drawTool){
             draw(e)
         }else{
@@ -144,21 +151,29 @@ onload=()=>{
     const pan=(e)=>{
         //console.log(e.clientX,e.clientY,painting,'we are panning')
 
-        //if(painting){
+        if(painting){
             panAmount[0]=e.clientX-prevPos[0]
             panAmount[1]=e.clientY-prevPos[1]
+
+            panAmount[0]=e.clientX-start[0]
+            panAmount[1]=e.clientY-start[1]
+
+
             totalPan[0]+=panAmount[0]
             totalPan[1]+=panAmount[1]
+            totalPan[0]=totalPan[0]
+            totalPan[1]=totalPan[1]
+            start=[e.clientX,e.clientY]
 
             //console.log(e.clientX,e.clientY,'this is it?')
-            console.log(panAmount)
+            //console.log(panAmount)
             c.translate(...panAmount)
             prevPos=[e.clientX,e.clientY]
             //console.log(prevPos,'this is prev')
             c.clearRect(-totalPan[0],-totalPan[1], c.canvas.width, c.canvas.height);
             //c.clearRect(totalPan[0],totalPan[1], c.canvas.width, c.canvas.height);
             redraw()
-        //}
+        }
     }
 
 
@@ -170,11 +185,22 @@ onload=()=>{
 
     document.addEventListener('keydown',(e)=>{
         if ( e.key==="h"){
+
+            console.log(currentCoord)
             mult+=.1
             c.scale(mult,mult)
-            scale=mult
+
+            scale*=mult
+            redraw()
+        }else if(e.key==='g'){
+            mult-=.1
+            c.scale(mult,mult)
+
+            scale*=mult
+            redraw()
 
         }
+
         if(e.key===" "){
             panning=!panning
             drawTool= !drawTool
