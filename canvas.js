@@ -1,219 +1,189 @@
-	var canvas = document.getElementsByTagName('canvas')[0];
-    const dim=window.innerWidth
-	canvas.width = dim;
-canvas.height = dim;
 
-	var gkhead = new Image;
+onload=()=>{
+    let canvas = document.querySelector('#myCanvas')
+    let mouse={
+        x:0,
+        y:0
+    }
 
-	window.onload = function(){		
-    
-		    var ctx = canvas.getContext('2d');
-		    trackTransforms(ctx);
-		  
-    function redraw(){
+    let scale=1
+    let canvasRect = canvas.getBoundingClientRect();
 
-          // Clear the entire canvas
-          var p1 = ctx.transformedPoint(0,0);
-          var p2 = ctx.transformedPoint(canvas.width,canvas.height);
-          ctx.clearRect(p1.x,p1.y,p2.x-p1.x,p2.y-p1.y);
+    let prevPos=[0,0]
 
-          ctx.save();
-          ctx.setTransform(1,0,0,1,0,0);
-          ctx.clearRect(0,0,canvas.width,canvas.height);
-          ctx.restore();
+    function getCoords(e) {
+        mouse.x = e.clientX || e.pageX || 0;
+        mouse.y = e.clientY || e.pageY || 0;
+        mouse.x -= canvasRect.left;
+        mouse.y -= canvasRect.top;
+        //mouse.x = cvSize*0.5 + (mouse.x - cvSize*0.5)/scale;
+        //mouse.y = cvSize*0.5 + (mouse.y - cvSize*0.5)/scale;
+    }
+    const dim=window.innerHeight
+    canvas.width =  dim
+    canvas.height = dim
+    const c = canvas.getContext('2d');
 
-          ctx.drawImage(gkhead,0,0);
+    let cvSize=dim
 
+
+    let painting =false
+    let drawing=[]
+    let stuff=[]
+
+    let start=[]
+    function startPos(e){
+        start=[e.clientX,e.clientY]
+        painting = true;
+    }
+
+    function endPos(e){
+
+        stuff.push(drawing)
+        //panAmount=[0,0]
+
+        //panAmount=[e.clientX-start[0],e.clientY-start[1]]
+
+//        if(panning){
+//            c.translate(panAmount[0],panAmount[1])
+//        }
+        redraw()
+        
+        painting = false;
+    }
+
+
+
+    num=1
+
+    let line= 1
+    let totalPan=[0,0]
+
+    const redraw=()=>{
+        c.clearRect(totalPan[0],totalPan[1], c.canvas.width, c.canvas.height);
+        c.fillStyle = "#a0a0a0";
+        c.fillRect(0,0,50,50)
+        c.fillStyle = "#FF0000";
+        c.fillRect(-totalPan[0],-totalPan[1],50,50)
+        for(let i =1;i < drawing.length;i++){
+            c.beginPath()
+            //c.moveTo(drawing[i-1][0],drawing[i-1][1])
+            //c.lineTo(drawing[i][0],drawing[i][1])
+            prevX=drawing[i-1][0]
+            prevY=drawing[i-1][1]
+            curX=drawing[i][0]
+            curY=drawing[i][1]
+            c.moveTo(...[prevX,prevY])
+            c.lineTo(...[curX,curY])
+            c.closePath()
+            c.stroke()
         }
-        redraw();
+    }
 
-      var lastX=canvas.width/2, lastY=canvas.height/2;
+    let mult=1
+    let screenToWorld=(ar)=>{
+        return [(ar[0]/mult)-totalPan[0],(ar[1]/mult)-totalPan[1]]
+    }
+    const transl=(ar)=>{
+        return [ar[0]-totalPan[0],ar[1]-totalPan[1]]
 
-      var dragStart,dragged;
+    }
 
-      canvas.addEventListener('mousedown',function(evt){
-          document.body.style.mozUserSelect = document.body.style.webkitUserSelect = document.body.style.userSelect = 'none';
-          lastX = evt.offsetX || (evt.pageX - canvas.offsetLeft);
-          lastY = evt.offsetY || (evt.pageY - canvas.offsetTop);
-          dragStart = ctx.transformedPoint(lastX,lastY);
-          dragged = false;
-      },false);
+    const draw=(e)=>{
+        getCoords(e)
+        //console.log(mouse.x,mouse.y)
 
-      canvas.addEventListener('mousemove',function(evt){
-          lastX = evt.offsetX || (evt.pageX - canvas.offsetLeft);
-          lastY = evt.offsetY || (evt.pageY - canvas.offsetTop);
-          dragged = true;
-          if (dragStart){
-            var pt = ctx.transformedPoint(lastX,lastY);
-            ctx.translate(pt.x-dragStart.x,pt.y-dragStart.y);
-            redraw();
-                }
-      },false);
+        if(!painting) return;
+        if(!prevPos ){
+            prevPos= [e.clientX,e.clientY]
+            return
+        }
+        console.log(window.offsetLeft)
+         //let screenCursor=[e.pageX-this.offsetLeft,e.pageY-this.offsetTop]
+        //drawing.push([e.clientX-totalPan[0],e.clientY-totalPan[1]])
+        //drawing.push([e.clientX-totalPan[0],e.clientY-totalPan[1]])
 
-      canvas.addEventListener('mouseup',function(evt){
-          dragStart = null;
-          if (!dragged) zoom(evt.shiftKey ? -1 : 1 );
-      },false);
-
-      var scaleFactor = 1.1;
-
-      var zoom = function(clicks){
-          var pt = ctx.transformedPoint(lastX,lastY);
-          ctx.translate(pt.x,pt.y);
-          var factor = Math.pow(scaleFactor,clicks);
-          ctx.scale(factor,factor);
-          ctx.translate(-pt.x,-pt.y);
-          redraw();
-      }
-
-      var handleScroll = function(evt){
-          var delta = evt.wheelDelta ? evt.wheelDelta/40 : evt.detail ? -evt.detail : 0;
-          if (delta) zoom(delta);
-          return evt.preventDefault() && false;
-      };
-    
-      canvas.addEventListener('DOMMouseScroll',handleScroll,false);
-      canvas.addEventListener('mousewheel',handleScroll,false);
-	};
-
-	gkhead.src = 'http://phrogz.net/tmp/gkhead.jpg';
-	
-	// Adds ctx.getTransform() - returns an SVGMatrix
-	// Adds ctx.transformedPoint(x,y) - returns an SVGPoint
-	function trackTransforms(ctx){
-      var svg = document.createElementNS("http://www.w3.org/2000/svg",'svg');
-      var xform = svg.createSVGMatrix();
-      ctx.getTransform = function(){ return xform; };
-
-      var savedTransforms = [];
-      var save = ctx.save;
-      ctx.save = function(){
-          savedTransforms.push(xform.translate(0,0));
-          return save.call(ctx);
-      };
-    
-      var restore = ctx.restore;
-      ctx.restore = function(){
-        xform = savedTransforms.pop();
-        return restore.call(ctx);
-		      };
-
-      var scale = ctx.scale;
-      ctx.scale = function(sx,sy){
-        xform = xform.scaleNonUniform(sx,sy);
-        return scale.call(ctx,sx,sy);
-		      };
-    
-      var rotate = ctx.rotate;
-      ctx.rotate = function(radians){
-          xform = xform.rotate(radians*180/Math.PI);
-          return rotate.call(ctx,radians);
-      };
-    
-      var translate = ctx.translate;
-      ctx.translate = function(dx,dy){
-          xform = xform.translate(dx,dy);
-          return translate.call(ctx,dx,dy);
-      };
-    
-      var transform = ctx.transform;
-      ctx.transform = function(a,b,c,d,e,f){
-          var m2 = svg.createSVGMatrix();
-          m2.a=a; m2.b=b; m2.c=c; m2.d=d; m2.e=e; m2.f=f;
-          xform = xform.multiply(m2);
-          return transform.call(ctx,a,b,c,d,e,f);
-      };
-    
-      var setTransform = ctx.setTransform;
-      ctx.setTransform = function(a,b,c,d,e,f){
-          xform.a = a;
-          xform.b = b;
-          xform.c = c;
-          xform.d = d;
-          xform.e = e;
-          xform.f = f;
-          return setTransform.call(ctx,a,b,c,d,e,f);
-      };
-    
-      var pt  = svg.createSVGPoint();
-      ctx.transformedPoint = function(x,y){
-          pt.x=x; pt.y=y;
-          return pt.matrixTransform(xform.inverse());
-      }
-const pencil = (e)=>{
-    ctx.beginPath()
-    console.log(screen.height,screen.width)
-    let ax=0
-    let ay=0
-
-    ctx.moveTo((dim/2+this.scrollX-ax), (dim/2+this.scrollY-ay))
-    ctx.lineTo((e.clientX-dim/2+this.scrollX-ax), (e.clientY-dim/2+this.scrollY-ay))
-
-    //drawPath.push([(e.clientX-dim/2+this.scrollX), (e.clientY-dim/2+this.scrollY)])
-    //console.log(mult,[e.clientX-dim/2+this.scrollX*mult, e.clientY-dim/2+this.scrollY*mult])
-
-    ctx.closePath()
-    ctx.stroke()
-
-}
-function draw(e, callback){
-
-    mouseX = e.pageX - this.offsetLeft + this.scrollX;
-    mouseY = e.pageY - this.offsetTop+ this.scrollY;
+        //drawing.push([e.clientX/mult+totalPan[0]/mult,e.clientY/mult+totalPan[1]/mult])
 
 
-    if(!painting) return;
-//    if(!prevPos ){
-//        prevPos = [mouseX+this.scrollX,mouseY+this.scrollY]
-//        return
-//    }
-        ctx.lineWidth = line;
-        ctx.lineCap = 'round';
-        ctx.strokeStyle = "green";
-        ctx.beginPath()
+        //drawing.push([...screenToWorld([e.clientX,e.clientY])])
+        //drawing.push([e.clientX,e.clientY])
+        drawing.push(screenToWorld([e.clientX,e.clientY]))
 
-        ctx.closePath()
-        if(360%deg===0){
-            
-            for(let i =0;i < 360/deg;i++ ){
-                ctx.rotate(deg * Math.PI / 180); // rotate canvas
-                pencil(e)
+        //console.log(totalPan)
+//            if(true){
+//            c.lineWidth = line;
+//            c.lineCap = 'round';
+//            c.beginPath()
+//            c.moveTo(prevPos[0],prevPos[1])
+//            c.lineTo(mouse.x,mouse.y)
+//            c.closePath()
+//            c.stroke()
+//            c.save()
+//
+//            c.restore()
+//            prevPos=[ mouse.x, mouse.y]
+//        }
+        redraw()
+    }
 
-            }
+    let drawTool=true
+
+
+    const tool=(e)=>{
+        if(drawTool){
+            draw(e)
         }else{
-            for(let i =0;i < 359;i++ ){
-                ctx.rotate(deg * Math.PI / 180); // rotate canvas
-                callback(e)
-
-            }
+            pan(e)
+            //redraw()
+            
 
         }
+    }
+    let panAmount=[0,0]
+    const pan=(e)=>{
+        //console.log(e.clientX,e.clientY,painting,'we are panning')
+
+        //if(painting){
+            panAmount[0]=e.clientX-prevPos[0]
+            panAmount[1]=e.clientY-prevPos[1]
+            totalPan[0]+=panAmount[0]
+            totalPan[1]+=panAmount[1]
+
+            //console.log(e.clientX,e.clientY,'this is it?')
+            console.log(panAmount)
+            c.translate(...panAmount)
+            prevPos=[e.clientX,e.clientY]
+            //console.log(prevPos,'this is prev')
+            c.clearRect(-totalPan[0],-totalPan[1], c.canvas.width, c.canvas.height);
+            //c.clearRect(totalPan[0],totalPan[1], c.canvas.width, c.canvas.height);
+            redraw()
+        //}
+    }
 
 
-        ctx.restore()
+    canvas.addEventListener('mousedown', startPos,false)
+    canvas.addEventListener('mouseup', endPos,false)
+    canvas.addEventListener('mousemove',tool,false)
+    let panning=false
 
 
-        //prevPos=[ e.clientX , e.clientY]
+    document.addEventListener('keydown',(e)=>{
+        if ( e.key==="h"){
+            mult+=.1
+            c.scale(mult,mult)
+            scale=mult
+
+        }
+        if(e.key===" "){
+            panning=!panning
+            drawTool= !drawTool
+            //console.log('pan',panning)
+            //c.translate(200,0)
+            redraw()
+        }
+    })
 
 }
 
-function startPos(e){
-    start=[e.clientX,e.clientY]
 
-    painting = true;
-    drawing=[]
-}
-
-function endPos(e){
-    stuff.push(drawing)
-    drawing=[]
-    //prevPos=[]
-    painting = false;
-    drawPath.push([])
-}
-
-
-
-
-      canvas.addEventListener('mousemove',(e)=> pencil(e))
-}

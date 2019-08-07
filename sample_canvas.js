@@ -1,6 +1,7 @@
 onload=()=>{
 let canvas = document.querySelector('#myCanvas')
 const dim=window.innerWidth
+let center=[dim/2,dim/2]
 
 canvas.width =  dim
 canvas.height = dim
@@ -68,10 +69,10 @@ const pencil = (e)=>{
     }
 
     //c.moveTo((prevPos[0]-dim/2+this.scrollX )*mult, (prevPos[1]-dim/2+this.scrollY)*mult)
-    c.moveTo((prevPos[0]-dim/2+this.scrollX-ax)*mult, (prevPos[1]-dim/2+this.scrollY-ay)*mult)
-    c.lineTo((e.clientX-dim/2+this.scrollX-ax)*mult, (e.clientY-dim/2+this.scrollY-ay)*mult)
+    c.moveTo((prevPos[0]-center[0]+this.scrollX)*mult, (prevPos[1]-center[1]+this.scrollY)*mult)
+    c.lineTo((e.clientX-center[0]+this.scrollX)*mult, (e.clientY-center[1]+this.scrollY)*mult)
 
-    drawPath.push([(e.clientX-dim/2+this.scrollX)*mult, (e.clientY-dim/2+this.scrollY)*mult])
+    drawPath.push([(e.clientX-center[0]+this.scrollX)*mult, (e.clientY-center[1]+this.scrollY)*mult])
     //console.log(mult,[e.clientX-dim/2+this.scrollX*mult, e.clientY-dim/2+this.scrollY*mult])
 
     c.closePath()
@@ -255,12 +256,21 @@ document.addEventListener('keydown',(e)=>{
 
           var factor = Math.pow(scaleFactor,clicks);
           mult*=1/factor
-          c.translate((e.clientX-dim/2+this.scrollX),(e.clientY-dim/2+this.scrollY))
+          //c.translate((e.clientX-center[0]+this.scrollX),(e.clientY-center[1]+this.scrollY))
           transl=[(e.clientX-dim/2+this.scrollX), (e.clientY-dim/2+this.scrollY)]
           c.scale(factor,factor)
 
 
-          c.translate(-(e.clientX-dim/2+this.scrollX),- (e.clientY-dim/2+this.scrollY))
+          //c.translate(-(e.clientX-center[0]+this.scrollX),- (e.clientY-center[1]+this.scrollY))
+          center=[-(e.clientX-center[0]+this.scrollX),- (e.clientY-center[1]+this.scrollY)]
+
+          //c.transform(1,0,0,1,center[0], center[1])
+          c.save()
+
+
+
+
+        //c.transform(1,0,0,1,dim/2,dim/2)
           //let xtrans+= transl[0]
 
         c.clearRect(-dim, -dim, dim*2, dim*2);
