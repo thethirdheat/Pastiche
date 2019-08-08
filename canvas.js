@@ -11,6 +11,7 @@ onload=()=>{
 
     let prevPos=[0,0]
     let currentCoord=[]
+    let boxes=[]
 
     function getCoords(e) {
         mouse.x = e.clientX || e.pageX || 0;
@@ -36,6 +37,7 @@ onload=()=>{
     function startPos(e){
         start=[e.clientX,e.clientY]
         painting = true;
+        boxes.push(start)
     }
 
     function endPos(e){
@@ -61,15 +63,14 @@ onload=()=>{
     let totalPan=[0,0]
 
     const redraw=()=>{
-        c.clearRect(totalPan[0],totalPan[1], c.canvas.width, c.canvas.height);
+        c.clearRect(-totalPan[0]*scale,-totalPan[1]*scale, c.canvas.width*scale, c.canvas.height*scale);
+
         c.fillStyle = "#a0a0a0";
         c.fillRect(0,0,50,50)
         c.fillStyle = "#FF0000";
         c.fillRect(-totalPan[0],-totalPan[1],50,50)
         for(let i =1;i < drawing.length;i++){
             c.beginPath()
-            //c.moveTo(drawing[i-1][0],drawing[i-1][1])
-            //c.lineTo(drawing[i][0],drawing[i][1])
             prevX=drawing[i-1][0]
             prevY=drawing[i-1][1]
             curX=drawing[i][0]
@@ -79,16 +80,22 @@ onload=()=>{
             c.closePath()
             c.stroke()
         }
+        //Draw Boxes On Clicks
+        for(let i =0;i< boxes.length;i++){
+            c.fillRect(...boxes[i],50,50) 
+        }
     }
 
     let mult=1
     let screenToWorld=(ar)=>{
-        return [(ar[0]/scale)-totalPan[0]/scale,(ar[1]/scale)-totalPan[1]/scale]
+        return [(ar[0]/scale)-totalPan[0],(ar[1]/scale)-totalPan[1]]
     }
     const worldToScreen=(ar)=>{
-        return [ar[0]/mult-totalPan[0],ar[1]/mult-totalPan[1]]
+        return [(ar[0]-totalPan[0])*mult,(ar[1]-totalPan[1])*scale]
 
     }
+    let zoomedOffset=[0,0]
+    let zoomed=false
 
     const draw=(e)=>{
         getCoords(e)
@@ -112,6 +119,8 @@ onload=()=>{
         /*this */
 
         drawing.push([...screenToWorld([e.clientX,e.clientY])])
+
+        //drawing.push([...worldToScreen([e.clientX,e.clientY])])
 
         //drawing.push([e.clientX,e.clientY])
         //drawing.push(screenToWorld(worldToScreen([e.clientX,e.clientY])))
@@ -149,28 +158,20 @@ onload=()=>{
     }
     let panAmount=[0,0]
     const pan=(e)=>{
-        //console.log(e.clientX,e.clientY,painting,'we are panning')
 
         if(painting){
-            panAmount[0]=e.clientX-prevPos[0]
-            panAmount[1]=e.clientY-prevPos[1]
 
-            panAmount[0]=e.clientX-start[0]
-            panAmount[1]=e.clientY-start[1]
+            panAmount[0]=(e.clientX-start[0])//scale
+            panAmount[1]=(e.clientY-start[1])//scale
 
 
             totalPan[0]+=panAmount[0]
             totalPan[1]+=panAmount[1]
-            totalPan[0]=totalPan[0]
-            totalPan[1]=totalPan[1]
+
             start=[e.clientX,e.clientY]
 
-            //console.log(e.clientX,e.clientY,'this is it?')
-            //console.log(panAmount)
             c.translate(...panAmount)
-            prevPos=[e.clientX,e.clientY]
-            //console.log(prevPos,'this is prev')
-            c.clearRect(-totalPan[0],-totalPan[1], c.canvas.width, c.canvas.height);
+            c.clearRect(-totalPan[0]*scale,-totalPan[1]*scale, c.canvas.width*scale, c.canvas.height*scale);
             //c.clearRect(totalPan[0],totalPan[1], c.canvas.width, c.canvas.height);
             redraw()
         }
@@ -185,12 +186,25 @@ onload=()=>{
 
     document.addEventListener('keydown',(e)=>{
         if ( e.key==="h"){
-
-            console.log(currentCoord)
+            let zoomed=true
             mult+=.1
-            c.scale(mult,mult)
 
+            let hold =[1,1]
+
+            let beforeZoom=screenToWorld(hold)
+            c.scale(mult,mult)
             scale*=mult
+
+            let afterZoom=screenToWorld(hold)
+
+            let zoomedOffset=[beforeZoom[0]-afterZoom[0],beforeZoom[1]-afterZoom[1]]
+
+            console.log(zoomedOffset)
+            totalPan[0]-=zoomedOffset[0]
+            totalPan[1]-=zoomedOffset[1]
+
+
+
             redraw()
         }else if(e.key==='g'){
             mult-=.1
@@ -199,15 +213,20 @@ onload=()=>{
             scale*=mult
             redraw()
 
+        }else if(e.key==='z'){
+            c.scale(1/scale,1/scale)
+            scale=1
+            c.translate(-totalPan[0],-totalPan[1])
+
+            totalPan=[0,0]
         }
 
         if(e.key===" "){
             panning=!panning
             drawTool= !drawTool
-            //console.log('pan',panning)
-            //c.translate(200,0)
             redraw()
         }
+
     })
 
 }
