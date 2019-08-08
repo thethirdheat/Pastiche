@@ -1,68 +1,57 @@
-
 onload=()=>{
+    //Setting up Canvas
     let canvas = document.querySelector('#myCanvas')
-    let mouse={
-        x:0,
-        y:0
-    }
-
-    let scale=1
-    let canvasRect = canvas.getBoundingClientRect();
-
-    let prevPos=[0,0]
-    let currentCoord=[]
-    let boxes=[]
-
-    function getCoords(e) {
-        mouse.x = e.clientX || e.pageX || 0;
-        mouse.y = e.clientY || e.pageY || 0;
-        mouse.x -= canvasRect.left;
-        mouse.y -= canvasRect.top;
-        //mouse.x = cvSize*0.5 + (mouse.x - cvSize*0.5)/scale;
-        //mouse.y = cvSize*0.5 + (mouse.y - cvSize*0.5)/scale;
-    }
     const dim=window.innerHeight
     canvas.width =  dim
     canvas.height = dim
     const c = canvas.getContext('2d');
 
-    let cvSize=dim
 
+    //Zoom Factor
+    let scale=1
 
-    let painting =false
-    let drawing=[]
-    let stuff=[]
-
+    //Last Position
+    let prevPos=[0,0]
     let start=[]
-    function startPos(e){
+
+    //Boxes Indicating alst click
+    let boxes=[]
+
+
+    //If mouse1 is down
+    let painting =false
+
+    //The array of [x,y] coordinates for the strokes
+    let drawing=[]
+
+
+    //This is the offset for the pan Amount
+    let totalPan=[0,0]
+
+
+    //This is the difference between when the mouse is clicked to start pan and the new postion its dragged to
+    let panAmount=[0,0]
+
+
+    const startPos=(e)=>{
         start=[e.clientX,e.clientY]
         painting = true;
         boxes.push(start)
     }
 
-    function endPos(e){
-
-        stuff.push(drawing)
-        //panAmount=[0,0]
-
-        //panAmount=[e.clientX-start[0],e.clientY-start[1]]
-
-//        if(panning){
-//            c.translate(panAmount[0],panAmount[1])
-//        }
+    const endPos=(e)=>{
         redraw()
-        
+        //totalPan[0]=totalPan[0]/scale
+        //totalPan[1]=totalPan[1]/scale
         painting = false;
+
     }
 
 
 
-    num=1
-
-    let line= 1
-    let totalPan=[0,0]
 
     const redraw=()=>{
+        console.log(totalPan,'-----------this is to talp apn --------------')
         c.clearRect(-totalPan[0]*scale,-totalPan[1]*scale, c.canvas.width*scale, c.canvas.height*scale);
 
         c.fillStyle = "#a0a0a0";
@@ -80,6 +69,7 @@ onload=()=>{
             c.closePath()
             c.stroke()
         }
+
         //Draw Boxes On Clicks
         for(let i =0;i< boxes.length;i++){
             c.fillRect(...boxes[i],50,50) 
@@ -87,82 +77,61 @@ onload=()=>{
     }
 
     let mult=1
+    //This transform screen coorindates to the painting coordinates
     let screenToWorld=(ar)=>{
         return [(ar[0]/scale)-totalPan[0],(ar[1]/scale)-totalPan[1]]
     }
+
     const worldToScreen=(ar)=>{
         return [(ar[0]-totalPan[0])*mult,(ar[1]-totalPan[1])*scale]
-
     }
     let zoomedOffset=[0,0]
     let zoomed=false
 
     const draw=(e)=>{
-        getCoords(e)
-        //console.log(mouse.x,mouse.y)
-
         if(!painting) return;
         if(!prevPos ){
             prevPos= [e.clientX,e.clientY]
             return
         }
-        //console.log(window.offsetLeft)
-         //let screenCursor=[e.pageX-this.offsetLeft,e.pageY-this.offsetTop]
-        //drawing.push([e.clientX-totalPan[0],e.clientY-totalPan[1]])
-        //drawing.push([e.clientX-totalPan[0],e.clientY-totalPan[1]])
-
-        //drawing.push([e.clientX/mult+totalPan[0]/mult,e.clientY/mult+totalPan[1]/mult])
-
 
         /*thi sis working */
         //drawing.push([...screenToWorld([e.clientX/scale,e.clientY/scale])])
         /*this */
 
-        drawing.push([...screenToWorld([e.clientX,e.clientY])])
+        drawing.push([...screenToWorld([e.clientX,e.clientY])].slice())
 
-        //drawing.push([...worldToScreen([e.clientX,e.clientY])])
-
-        //drawing.push([e.clientX,e.clientY])
-        //drawing.push(screenToWorld(worldToScreen([e.clientX,e.clientY])))
-
-        //console.log(totalPan)
-//            if(true){
-//            c.lineWidth = line;
-//            c.lineCap = 'round';
-//            c.beginPath()
-//            c.moveTo(prevPos[0],prevPos[1])
-//            c.lineTo(mouse.x,mouse.y)
-//            c.closePath()
-//            c.stroke()
-//            c.save()
-//
-//            c.restore()
-//            prevPos=[ mouse.x, mouse.y]
-//        }
-        redraw()
+       redraw()
     }
 
+    //This is to toggle on and of the 'brush' tool as opposed to panning
     let drawTool=true
 
 
+
+    //The tool which will be called to brush or pan
     const tool=(e)=>{
         currentCoord=[e.clientX,e.clientY]
         if(drawTool){
             draw(e)
         }else{
             pan(e)
-            //redraw()
-            
-
+            redraw()
         }
     }
-    let panAmount=[0,0]
+
+
     const pan=(e)=>{
-
         if(painting){
+            /*
+                const x = event.center.x / (this._canvas.width / sWidth) + this._sx;
+                const y = event.center.y / (this._canvas.height / sHeight) + this._sy;
+                this._sx += (this._canvasPanStart.x - x);
+                this._sy += (this._canvasPanStart.y - y) ;
+            */
 
-            panAmount[0]=(e.clientX-start[0])//scale
-            panAmount[1]=(e.clientY-start[1])//scale
+            panAmount[0]=(e.clientX-start[0])
+            panAmount[1]=(e.clientY-start[1])
 
 
             totalPan[0]+=panAmount[0]
@@ -178,9 +147,6 @@ onload=()=>{
     }
 
 
-    canvas.addEventListener('mousedown', startPos,false)
-    canvas.addEventListener('mouseup', endPos,false)
-    canvas.addEventListener('mousemove',tool,false)
     let panning=false
 
 
@@ -189,19 +155,22 @@ onload=()=>{
             let zoomed=true
             mult+=.1
 
-            let hold =[1,1]
+            //let hold =[1,1]
+            let hold =currentCoord
 
             let beforeZoom=screenToWorld(hold)
+            c.translate(-totalPan[0],-totalPan[1])
             c.scale(mult,mult)
             scale*=mult
 
             let afterZoom=screenToWorld(hold)
 
-            let zoomedOffset=[beforeZoom[0]-afterZoom[0],beforeZoom[1]-afterZoom[1]]
+            totalPan=[0,0]
+            //let zoomedOffset=[beforeZoom[0]-afterZoom[0],beforeZoom[1]-afterZoom[1]]
 
             console.log(zoomedOffset)
-            totalPan[0]-=zoomedOffset[0]
-            totalPan[1]-=zoomedOffset[1]
+            //totalPan[0]-=zoomedOffset[0]
+            //totalPan[1]-=zoomedOffset[1]
 
 
 
@@ -219,6 +188,7 @@ onload=()=>{
             c.translate(-totalPan[0],-totalPan[1])
 
             totalPan=[0,0]
+            redraw()
         }
 
         if(e.key===" "){
@@ -228,6 +198,10 @@ onload=()=>{
         }
 
     })
+
+    canvas.addEventListener('mousedown', startPos,false)
+    canvas.addEventListener('mouseup', endPos,false)
+    canvas.addEventListener('mousemove',tool,false)
 
 }
 
