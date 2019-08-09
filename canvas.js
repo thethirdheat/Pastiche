@@ -1,7 +1,8 @@
 onload=()=>{
     //Setting up Canvas
     let canvas = document.querySelector('#myCanvas')
-    const dim=window.innerHeight
+    //const dim=window.innerHeight
+    const dim=window.innerWidth
     canvas.width =  dim
     canvas.height = dim
     const c = canvas.getContext('2d');
@@ -130,8 +131,8 @@ onload=()=>{
                 this._sy += (this._canvasPanStart.y - y) ;
             */
 
-            panAmount[0]=(e.clientX-start[0])
-            panAmount[1]=(e.clientY-start[1])
+            panAmount[0]=(e.clientX-start[0])/scale
+            panAmount[1]=(e.clientY-start[1])/scale
 
 
             totalPan[0]+=panAmount[0]
@@ -151,6 +152,7 @@ onload=()=>{
 
 
     document.addEventListener('keydown',(e)=>{
+        e.preventDefault()
         if ( e.key==="h"){
             let zoomed=true
             mult+=.1
@@ -177,9 +179,11 @@ onload=()=>{
             redraw()
         }else if(e.key==='g'){
             mult-=.1
+            c.translate(-totalPan[0],-totalPan[1])
             c.scale(mult,mult)
 
             scale*=mult
+            totalPan=[0,0]
             redraw()
 
         }else if(e.key==='z'){
