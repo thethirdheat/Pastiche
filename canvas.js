@@ -53,7 +53,7 @@ onload=()=>{
 
 
     const redraw=()=>{
-        console.log(totalPan,'-----------this is to talp apn --------------')
+        //console.log(totalPan,'-----------this is to talp apn --------------')
         c.clearRect(-totalPan[0]*scale,-totalPan[1]*scale, c.canvas.width*scale, c.canvas.height*scale);
 
         c.fillStyle = "#a0a0a0";
@@ -159,24 +159,40 @@ onload=()=>{
             mult+=.1
 
             //let hold =[1,1]
-            //let hold =currentCoord
+            let hold =[currentCoord[0]+dim,currentCoord[1]+dim]
+            console.log(currentCoord,'<--------------------this is curcord')
+            console.log(hold,'<--------------------this is hold')
 
-            //let beforeZoom=screenToWorld(hold)
+            let beforeZoom=screenToWorld(hold)
+
+
             c.translate(-totalPan[0],-totalPan[1])
-            c.scale(mult,mult)
             scale*=mult
+            c.scale(mult,mult)
 
-            //let afterZoom=screenToWorld(hold)
-            //canvas.width =  dim*(scale)
-            //canvas.height = dim*(scale)
+            //c.translate(totalPan[0]*mult,totalPan[1]*mult)
+            //totalPan[0]-=totalPan[0]*mult
+            //totalPan[1]-=totalPan[1]*mult
 
-            totalPan=[0,0]
-            //let zoomedOffset=[beforeZoom[0]-afterZoom[0],beforeZoom[1]-afterZoom[1]]
+            let afterZoom=screenToWorld(hold)
 
-            console.log(zoomedOffset)
+
+
+
+            let zoomedOffset=[beforeZoom[0]-afterZoom[0],beforeZoom[1]-afterZoom[1]]
+            console.log("thisi is before",beforeZoom,'this is afeter: ',afterZoom)
+            console.log('this isis zoomofset',zoomedOffset)
+            //c.translate(...zoomedOffset)
+            let trsl=[-zoomedOffset[0]+totalPan[0],-zoomedOffset[1]+totalPan[1]]
+            c.translate(...trsl)
+            totalPan=trsl
+
+
+            console.log(trsl,'<=====================this is is translate?')
+            //console.log(zoomedOffset,"this is offset", beforeZoom,'thisis after:',afterZoom)
             //totalPan[0]-=zoomedOffset[0]
             //totalPan[1]-=zoomedOffset[1]
-            console.log(mult)
+            //console.log(mult)
 
 
 
