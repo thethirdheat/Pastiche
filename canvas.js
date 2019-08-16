@@ -3,8 +3,8 @@ onload=()=>{
     let canvas = document.querySelector('#myCanvas')
     //const dim=window.innerHeight
     const dim=window.innerWidth
-    canvas.width =  dim
-    canvas.height = dim
+    canvas.width =  dim*2
+    canvas.height = dim*2
     const c = canvas.getContext('2d');
 
 
@@ -48,6 +48,7 @@ onload=()=>{
 
     }
 
+    c.translate(-dim,-dim)
 
 
 
@@ -100,7 +101,7 @@ onload=()=>{
         //drawing.push([...screenToWorld([e.clientX/scale,e.clientY/scale])])
         /*this */
 
-        drawing.push([...screenToWorld([e.clientX,e.clientY])].slice())
+        drawing.push([...screenToWorld([e.clientX+dim,e.clientY+dim])].slice())
 
        redraw()
     }
@@ -158,14 +159,16 @@ onload=()=>{
             mult+=.1
 
             //let hold =[1,1]
-            let hold =currentCoord
+            //let hold =currentCoord
 
-            let beforeZoom=screenToWorld(hold)
+            //let beforeZoom=screenToWorld(hold)
             c.translate(-totalPan[0],-totalPan[1])
             c.scale(mult,mult)
             scale*=mult
 
-            let afterZoom=screenToWorld(hold)
+            //let afterZoom=screenToWorld(hold)
+            //canvas.width =  dim*(scale)
+            //canvas.height = dim*(scale)
 
             totalPan=[0,0]
             //let zoomedOffset=[beforeZoom[0]-afterZoom[0],beforeZoom[1]-afterZoom[1]]
@@ -173,6 +176,7 @@ onload=()=>{
             console.log(zoomedOffset)
             //totalPan[0]-=zoomedOffset[0]
             //totalPan[1]-=zoomedOffset[1]
+            console.log(mult)
 
 
 
@@ -187,11 +191,12 @@ onload=()=>{
             redraw()
 
         }else if(e.key==='z'){
-            c.scale(1/scale,1/scale)
-            scale=1
             c.translate(-totalPan[0],-totalPan[1])
-
             totalPan=[0,0]
+            c.scale(1/scale,1/scale)
+            mult=1
+            scale=1
+
             redraw()
         }
 
