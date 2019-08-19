@@ -28,7 +28,7 @@ onload=()=>{
 
     //If mouse1 is down
     let painting =false
-    let drawing=[]
+    let drawing=[[undefined,undefined,undefined,undefined]]
 
     //The array of [x,y] coordinates for the strokes
     if(localStorage.drawing){
@@ -65,6 +65,7 @@ onload=()=>{
     let deg = 30
 
 
+    let gridOn=true
 
     const redraw=()=>{
         //localStorage.setItem('drawing', JSON.stringify(drawing))
@@ -116,6 +117,19 @@ onload=()=>{
                 }
             }
         }
+        //if(gridOn===true){
+        if(gridOn){
+            if(360%deg===0){
+                for(let j =0;j < 360/deg;j++ ){
+                c.rotate(deg * Math.PI / 180); // rotate canvas
+            c.strokeStyle='black'
+            c.beginPath();
+            c.moveTo(-3000, 0);
+            c.lineTo( 3000,0);
+            c.stroke();
+                }
+            }
+        }
 
         //Draw Boxes On Clicks
         for(let i =0;i< boxes.length;i++){
@@ -145,6 +159,9 @@ onload=()=>{
         /*thi sis working */
         //drawing.push([...screenToWorld([e.clientX/scale,e.clientY/scale])])
         /*this */
+        if(360%deg===0){
+            for(let j =0;j < 360/deg;j++ ){
+            c.rotate(deg * Math.PI / 180); // rotate canvas
 
         c.beginPath()
 //        console.log(screen.height,screen.width)
@@ -162,21 +179,22 @@ onload=()=>{
         c.lineWidth=brushWidth*2
         //c.moveTo((prevPos[0]-center[0]+this.scrollX)*mult, (prevPos[1]-center[1]+this.scrollY)*mult)
         if(!drawing.length){
-            drawing.push([...screenToWorld([e.clientX+dim,e.clientY+dim]),brushWidth,brushColor])
+            drawing.push([...screenToWorld([e.clientX+dim,e.clientY-dimY]),brushWidth,brushColor])
         }
         c.moveTo(drawing[drawing.length-1][0], drawing[drawing.length-1][1])
         //c.lineTo((e.clientX-center[0]+this.scrollX)*mult, (e.clientY-center[1]+this.scrollY)*mult)
-        c.lineTo(...screenToWorld([e.clientX+dim,e.clientY+dim]))
+        c.lineTo(...screenToWorld([e.clientX+dim,e.clientY-dimY]))
     
         //console.log(mult,[e.clientX-dim/2+this.scrollX*mult, e.clientY-dim/2+this.scrollY*mult])
     
         c.closePath()
         c.stroke()
         //c.arc(curX,curY,brushWidth,0, Math.PI*2,false)
-        c.arc(...screenToWorld([e.clientX+dim,e.clientY+dim]),brushWidth,0,Math.PI*2,false)
+        c.arc(...screenToWorld([e.clientX+dim,e.clientY-dimY]),brushWidth,0,Math.PI*2,false)
         c.fill()
-
-        drawing.push([...screenToWorld([e.clientX+dim,e.clientY+dim]),brushWidth,brushColor])
+            }
+        }
+        drawing.push([...screenToWorld([e.clientX+dim,e.clientY-dimY]),brushWidth,brushColor])
 
        //redraw()
     }
@@ -217,9 +235,8 @@ onload=()=>{
             start=[e.clientX,e.clientY]
 
             c.translate(...panAmount)
-            c.clearRect(-totalPan[0]*scale,-totalPan[1]*scale, c.canvas.width*scale, c.canvas.height*scale);
+            //c.clearRect(-totalPan[0]*scale,-totalPan[1]*scale, c.canvas.width*scale, c.canvas.height*scale);
             //c.clearRect(totalPan[0],totalPan[1], c.canvas.width, c.canvas.height);
-            redraw()
         }
     }
     const colorPick = (lul)=>{
@@ -239,7 +256,7 @@ onload=()=>{
             mult+=.1
 
             //let hold =[1,1]
-            let hold =[currentCoord[0]+dim,currentCoord[1]+dim]
+            let hold =[currentCoord[0]+dim,currentCoord[1]-dimY]
             console.log(currentCoord,'<--------------------this is curcord')
             console.log(hold,'<--------------------this is hold')
 
@@ -287,7 +304,7 @@ onload=()=>{
 //            redraw()
 //
 
-            let hold =[currentCoord[0]+dim,currentCoord[1]+dim]
+            let hold =[currentCoord[0]+dim,currentCoord[1]-dimY]
             //console.log(currentCoord,'<--------------------this is curcord')
             //console.log(hold,'<--------------------this is hold')
 
@@ -363,9 +380,34 @@ onload=()=>{
 
     document.getElementById("html5colorpicker").onchange = change;
 
+    document.getElementById("undoButton").onclick = undo;
 
-    var slider = document.getElementById("myRange");
-    var output = document.getElementById("demo");
+
+    function undo(){
+        console.log('this is undo',drawing[drawing.length-1], drawing)
+            drawing.pop()
+        if(drawing[drawing.length-1]){
+            console.log(drawing[drawing.length-1])
+            while(drawing[drawing.length-1][0]!==undefined){
+                drawing.pop()
+            }
+        }else{
+            drawing=[[undefined,undefined,undefined,undefined]]
+        }
+        console.log(drawing[drawing.length-1])
+        redraw()
+    }
+
+    let slider = document.getElementById("myRange");
+
+    let output = document.getElementById("demo");
+
+    let gridHtml = document.getElementById("grids");
+
+    gridHtml.onclick = function(){
+        gridOn=!gridOn
+        redraw()
+    }
     //output.innerHTML = slider.value; // Display the default slider value
 
     // Update the current slider value (each time you drag the slider handle)
@@ -377,6 +419,7 @@ onload=()=>{
     canvas.addEventListener('mousedown', startPos,false)
     canvas.addEventListener('mouseup', endPos,false)
     canvas.addEventListener('mousemove',tool,false)
+
     window.onresize = function(e){
 
 
@@ -386,6 +429,7 @@ onload=()=>{
         //canvas.height = wind*2
          console.log('this is in the  resize: withis is::', dim)
     }
+    redraw()
 
 }
 
