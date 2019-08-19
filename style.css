@@ -9,15 +9,23 @@ body{
     position: relative;
     display: grid;
     grid-template-areas: "left right" ;
-    grid-template-columns: 500px 1fr;
+    grid-template-columns: 5000px 1fr;
 
     overflow: hidden;
     /*background: green;
 
      background-image: url("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQBcliz5VjGqI88McmwPkb2yimH2qqeielt-6AzhApCZzgfMQIr");*/
+    margin: 0;
+    height: 100%;
+    overflow: hidden;
 
 }
-html, body {margin: 0; height: 100%; overflow: hidden}
+html {
+    margin: 0;
+    height: 100%;
+    overflow: hidden;
+}
+
 /*
 body{
     width: 100vw;
@@ -50,8 +58,8 @@ canvas{
 }
 
 .palette{
+  width: 210px;
   grid-area: left;
-  position: relative;
   height: 100%;
   background: pink;
   z-index: 100;

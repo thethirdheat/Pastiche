@@ -7,7 +7,7 @@ onload=()=>{
     canvas.width =  dim*2
     canvas.height = dim*2
     const c = canvas.getContext('2d');
-    dim=-window.innerWidth/2
+    dim=-window.innerWidth/2-100
     dimY= window.innerHeight/2
 
 
@@ -19,11 +19,11 @@ onload=()=>{
     let start=[]
 
     //Boxes Indicating alst click
-    let boxes=[]
+    //let boxes=[]
 
     let brushWidth=.25
     let brushColor='green'
-    let brushFill = 'green'
+    let gridWidth = 1
 
 
     //If mouse1 is down
@@ -49,7 +49,7 @@ onload=()=>{
     const startPos=(e)=>{
         start=[e.clientX,e.clientY]
         painting = true;
-        boxes.push(start)
+        //boxes.push(start)
     }
 
     const endPos=(e)=>{
@@ -58,6 +58,9 @@ onload=()=>{
         //totalPan[1]=totalPan[1]/scale
         painting = false;
         drawing.push([undefined,undefined,undefined,undefined])
+        if(zoomInTool){
+            zoomIn()
+        }
 
     }
 
@@ -79,13 +82,13 @@ onload=()=>{
 
         //c.clearRect((-totalPan[0]-dim),(-totalPan[1]-dim), (c.canvas.width+dim), (c.canvas.height+dim));
 
-        c.fillStyle = "#a0a0a0";
-        c.fillRect(0,0,50,50)
-        c.fillStyle = "#FF0000";
+//        c.fillStyle = "#a0a0a0";
+//        c.fillRect(0,0,50,50)
+//        c.fillStyle = "#FF0000";
         //c.fillStyle = brushColor
         //c.strokeStyle=brushColor
 
-        c.fillRect(-totalPan[0],-totalPan[1],50,50)
+        //c.fillRect(-totalPan[0],-totalPan[1],50,50)
         //c.lineWidth=brushWidth*2
         let curBrushColor
         let curBrushWidth
@@ -119,6 +122,7 @@ onload=()=>{
         }
         //if(gridOn===true){
         if(gridOn){
+            c.lineWidth=gridWidth
             if(360%deg===0){
                 for(let j =0;j < 360/deg;j++ ){
                 c.rotate(deg * Math.PI / 180); // rotate canvas
@@ -132,9 +136,9 @@ onload=()=>{
         }
 
         //Draw Boxes On Clicks
-        for(let i =0;i< boxes.length;i++){
-            c.fillRect(...boxes[i],50,50) 
-        }
+//        for(let i =0;i< boxes.length;i++){
+//            c.fillRect(...boxes[i],50,50) 
+//        }
     }
 
     let mult=1
@@ -195,12 +199,28 @@ onload=()=>{
             }
         }
         drawing.push([...screenToWorld([e.clientX+dim,e.clientY-dimY]),brushWidth,brushColor])
+        if(gridOn){
+            c.lineWidth=gridWidth
+            if(360%deg===0){
+                for(let j =0;j < 360/deg;j++ ){
+                c.rotate(deg * Math.PI / 180); // rotate canvas
+            c.strokeStyle='black'
+            c.beginPath();
+            c.moveTo(-3000, 0);
+            c.lineTo( 3000,0);
+            c.stroke();
+                }
+            }
+        }
+
 
        //redraw()
     }
 
     //This is to toggle on and of the 'brush' tool as opposed to panning
     let drawTool=true
+    let panTool =false
+    let zoomInTool=false
 
 
 
@@ -209,10 +229,11 @@ onload=()=>{
         currentCoord=[e.clientX,e.clientY]
         if(drawTool){
             draw(e)
-        }else{
+        }else if(panTool){
             pan(e)
             redraw()
         }
+
     }
 
 
@@ -239,10 +260,48 @@ onload=()=>{
             //c.clearRect(totalPan[0],totalPan[1], c.canvas.width, c.canvas.height);
         }
     }
-    const colorPick = (lul)=>{
-        console.log(lul)
-        clickColor(0, -1, -1, 5)
-        console.log('fffffffffffffffffuck!')
+    const zoomIn = ()=>{
+
+            let zoomed=true
+            mult+=.1
+
+            //let hold =[1,1]
+            let hold =[currentCoord[0]+dim,currentCoord[1]-dimY]
+            console.log(currentCoord,'<--------------------this is curcord')
+            console.log(hold,'<--------------------this is hold')
+
+            let beforeZoom=screenToWorld(hold)
+
+
+            c.translate(-totalPan[0],-totalPan[1])
+            scale*=mult
+            c.scale(mult,mult)
+
+            //c.translate(totalPan[0]*mult,totalPan[1]*mult)
+            //totalPan[0]-=totalPan[0]*mult
+            //totalPan[1]-=totalPan[1]*mult
+
+            let afterZoom=screenToWorld(hold)
+
+
+
+
+            let zoomedOffset=[beforeZoom[0]-afterZoom[0],beforeZoom[1]-afterZoom[1]]
+            console.log("thisi is before",beforeZoom,'this is afeter: ',afterZoom)
+            console.log('this isis zoomofset',zoomedOffset)
+            //c.translate(...zoomedOffset)
+            let trsl=[-zoomedOffset[0]+totalPan[0],-zoomedOffset[1]+totalPan[1]]
+            c.translate(...trsl)
+            totalPan=trsl
+
+
+            console.log(trsl,'<=====================this is is translate?')
+            //console.log(zoomedOffset,"this is offset", beforeZoom,'thisis after:',afterZoom)
+            //totalPan[0]-=zoomedOffset[0]
+            //totalPan[1]-=zoomedOffset[1]
+            //console.log(mult)
+            redraw()
+
     }
 
 
@@ -356,7 +415,9 @@ onload=()=>{
         if(e.key===" "){
             panning=!panning
             drawTool= !drawTool
-            redraw()
+            panTool=!panTool
+
+            //redraw()
         }
         if(e.key==="q"){
             console.log(brushColor)
@@ -381,38 +442,72 @@ onload=()=>{
     document.getElementById("html5colorpicker").onchange = change;
 
     document.getElementById("undoButton").onclick = undo;
+    let redoArray=[]
 
 
     function undo(){
-        console.log('this is undo',drawing[drawing.length-1], drawing)
-            drawing.pop()
+        drawing.pop()
+        let holderArray=[]
         if(drawing[drawing.length-1]){
             console.log(drawing[drawing.length-1])
             while(drawing[drawing.length-1][0]!==undefined){
-                drawing.pop()
+                holderArray.push(drawing.pop())
             }
         }else{
             drawing=[[undefined,undefined,undefined,undefined]]
         }
         console.log(drawing[drawing.length-1])
+        redoArray.push(holderArray)
         redraw()
     }
 
+    function redo(){
+
+    }
     let slider = document.getElementById("myRange");
 
-    let output = document.getElementById("demo");
+    let zoomInButton = document.getElementById("zoomIn");
 
     let gridHtml = document.getElementById("grids");
+
+    let panButton = document.getElementById("pan");
+
+    let resetButton = document.getElementById("reset");
 
     gridHtml.onclick = function(){
         gridOn=!gridOn
         redraw()
     }
+    resetButton.onclick=function(){
+        c.translate(-totalPan[0],-totalPan[1])
+        totalPan=[0,0]
+        c.scale(1/scale,1/scale)
+        mult=1
+        scale=1
+
+        redraw()
+
+    }
+
+    zoomInButton.onclick=function(){
+        console.log('draw should be fales')
+        drawTool=false
+        panTool=false
+        zoomInTool=!zoomInTool
+
+
+    }
+
+    panButton.onclick = function(){
+        panning=!panning
+        drawTool= !drawTool
+        panTool=!panTool
+    }
     //output.innerHTML = slider.value; // Display the default slider value
 
     // Update the current slider value (each time you drag the slider handle)
     slider.oninput = function() {
-        //output.innerHTML = this.value;
+        //output.innerHTML = this.v        <button id="grids">Grid</button>alue;
         brushWidth=this.value
     }
 
