@@ -1,12 +1,14 @@
 onload=()=>{
+
     //Setting up Canvas
     let canvas = document.querySelector('#myCanvas')
     //const dim=window.innerHeight
-    const dim=window.innerWidth
+    let dim=window.innerWidth
     canvas.width =  dim*2
     canvas.height = dim*2
     const c = canvas.getContext('2d');
-    let brushWidth=.25
+    dim=-window.innerWidth/2
+    dimY= window.innerHeight/2
 
 
     //Zoom Factor
@@ -18,14 +20,22 @@ onload=()=>{
 
     //Boxes Indicating alst click
     let boxes=[]
+
+    let brushWidth=.25
     let brushColor='green'
+    let brushFill = 'green'
 
 
     //If mouse1 is down
     let painting =false
+    let drawing=[]
 
     //The array of [x,y] coordinates for the strokes
-    let drawing=[]
+    if(localStorage.drawing){
+        //console.log(localStorage.drawing)
+        //drawing=JSON.parse(localStorage.getItem('drawing'))
+        //drawing=JSON.parse(localStorage.getItem('drawing'))
+    }
 
 
     //This is the offset for the pan Amount
@@ -47,31 +57,49 @@ onload=()=>{
         //totalPan[0]=totalPan[0]/scale
         //totalPan[1]=totalPan[1]/scale
         painting = false;
-        drawing.push([undefined,undefined])
+        drawing.push([undefined,undefined,undefined,undefined])
 
     }
 
-    c.translate(-dim,-dim)
+    c.translate(-dim,dimY)
+    let deg = 30
 
 
 
     const redraw=()=>{
+        //localStorage.setItem('drawing', JSON.stringify(drawing))
+        //window.localStorage['drawing']=JSON.stringify(drawing)
         //canvas.width =  canvas.width
         //console.log(totalPan,'-----------this is to talp apn --------------')
         let rectMult = scale<1 ?  10000000000000*(1/scale):1
         console.log('this is saclae', scale, rectMult)
-        c.clearRect((-totalPan[0]-dim)*rectMult,(-totalPan[1]-dim)*rectMult, (c.canvas.width+dim)*rectMult, (c.canvas.height+dim)*rectMult);
-        c.clearRect((-totalPan[0]-dim),(-totalPan[1]-dim), (c.canvas.width+dim), (c.canvas.height+dim));
+        c.clearRect((-totalPan[0]+dim)*rectMult,(-totalPan[1]+dim)*rectMult, (c.canvas.width+dim)*rectMult, (c.canvas.height+dim)*rectMult);
+        //c.clearRect(-Infinity,-Infinity,Infinity,Infinity)
+
+        //c.clearRect((-totalPan[0]-dim),(-totalPan[1]-dim), (c.canvas.width+dim), (c.canvas.height+dim));
 
         c.fillStyle = "#a0a0a0";
         c.fillRect(0,0,50,50)
-        //c.fillStyle = "#FF0000";
-        c.fillStyle = brushColor
-        c.strokeStyle=brushColor
+        c.fillStyle = "#FF0000";
+        //c.fillStyle = brushColor
+        //c.strokeStyle=brushColor
 
         c.fillRect(-totalPan[0],-totalPan[1],50,50)
-        c.lineWidth=brushWidth*2
+        //c.lineWidth=brushWidth*2
+        let curBrushColor
+        let curBrushWidth
         for(let i =1;i < drawing.length;i++){
+
+            if(360%deg===0){
+                for(let j =0;j < 360/deg;j++ ){
+                c.rotate(deg * Math.PI / 180); // rotate canvas
+            curBrushColor = drawing[i][3]
+            curBrushWidth = drawing[i][2]
+
+            c.strokeStyle=curBrushColor
+            c.fillStyle = curBrushColor
+
+            c.lineWidth=curBrushWidth*2
             c.beginPath()
             prevX=drawing[i-1][0]
             prevY=drawing[i-1][1]
@@ -82,8 +110,11 @@ onload=()=>{
             c.closePath()
 
             c.stroke()
-            c.arc(curX,curY,brushWidth*.85,0, Math.PI*2,false)
+            //c.arc(curX,curY,curBrushWidth*.85,0, Math.PI*2,false)
+            c.arc(curX,curY,curBrushWidth,0, Math.PI*2,false)
             c.fill()
+                }
+            }
         }
 
         //Draw Boxes On Clicks
@@ -125,9 +156,13 @@ onload=()=>{
 //        }
     
             //c.moveTo((prevPos[0]-dim/2+this.scrollX )*mult, (prevPos[1]-dim/2+this.scrollY)*mult)
+        c.strokeStyle=brushColor
+        c.fillStyle = brushColor
+
+        c.lineWidth=brushWidth*2
         //c.moveTo((prevPos[0]-center[0]+this.scrollX)*mult, (prevPos[1]-center[1]+this.scrollY)*mult)
         if(!drawing.length){
-            drawing.push([...screenToWorld([e.clientX+dim,e.clientY+dim])].slice())
+            drawing.push([...screenToWorld([e.clientX+dim,e.clientY+dim]),brushWidth,brushColor])
         }
         c.moveTo(drawing[drawing.length-1][0], drawing[drawing.length-1][1])
         //c.lineTo((e.clientX-center[0]+this.scrollX)*mult, (e.clientY-center[1]+this.scrollY)*mult)
@@ -138,10 +173,10 @@ onload=()=>{
         c.closePath()
         c.stroke()
         //c.arc(curX,curY,brushWidth,0, Math.PI*2,false)
-        c.arc(...screenToWorld([e.clientX+dim,e.clientY+dim]),brushWidth*.95,0,Math.PI*2,false)
+        c.arc(...screenToWorld([e.clientX+dim,e.clientY+dim]),brushWidth,0,Math.PI*2,false)
         c.fill()
 
-        drawing.push([...screenToWorld([e.clientX+dim,e.clientY+dim])].slice())
+        drawing.push([...screenToWorld([e.clientX+dim,e.clientY+dim]),brushWidth,brushColor])
 
        //redraw()
     }
@@ -186,6 +221,11 @@ onload=()=>{
             //c.clearRect(totalPan[0],totalPan[1], c.canvas.width, c.canvas.height);
             redraw()
         }
+    }
+    const colorPick = (lul)=>{
+        console.log(lul)
+        clickColor(0, -1, -1, 5)
+        console.log('fffffffffffffffffuck!')
     }
 
 
@@ -248,8 +288,8 @@ onload=()=>{
 //
 
             let hold =[currentCoord[0]+dim,currentCoord[1]+dim]
-            console.log(currentCoord,'<--------------------this is curcord')
-            console.log(hold,'<--------------------this is hold')
+            //console.log(currentCoord,'<--------------------this is curcord')
+            //console.log(hold,'<--------------------this is hold')
 
             let beforeZoom=screenToWorld(hold)
 
@@ -268,15 +308,15 @@ onload=()=>{
 
 
             let zoomedOffset=[beforeZoom[0]-afterZoom[0],beforeZoom[1]-afterZoom[1]]
-            console.log("thisi is before",beforeZoom,'this is afeter: ',afterZoom)
-            console.log('this isis zoomofset',zoomedOffset)
+            //console.log("thisi is before",beforeZoom,'this is afeter: ',afterZoom)
+            //console.log('this isis zoomofset',zoomedOffset)
             //c.translate(...zoomedOffset)
             let trsl=[-zoomedOffset[0]+totalPan[0],-zoomedOffset[1]+totalPan[1]]
             c.translate(...trsl)
             totalPan=trsl
 
 
-            console.log(trsl,'<=====================this is is translate?')
+            //console.log(trsl,'<=====================this is is translate?')
             //console.log(zoomedOffset,"this is offset", beforeZoom,'thisis after:',afterZoom)
             //totalPan[0]-=zoomedOffset[0]
             //totalPan[1]-=zoomedOffset[1]
@@ -301,12 +341,51 @@ onload=()=>{
             drawTool= !drawTool
             redraw()
         }
+        if(e.key==="q"){
+            console.log(brushColor)
+            brushColor='green'
+        }
+        if(e.key==="w"){
+            console.log(brushColor)
+            brushColor='pink'
+        }
+        if(e.key==="e"){
+            brushWidth=35
+        }
 
     })
+    function change(e){
+        brushColor=this.value
+        console.log(this.value)
+        //color = this.value;
+
+    }
+
+    document.getElementById("html5colorpicker").onchange = change;
+
+
+    var slider = document.getElementById("myRange");
+    var output = document.getElementById("demo");
+    //output.innerHTML = slider.value; // Display the default slider value
+
+    // Update the current slider value (each time you drag the slider handle)
+    slider.oninput = function() {
+        //output.innerHTML = this.value;
+        brushWidth=this.value
+    }
 
     canvas.addEventListener('mousedown', startPos,false)
     canvas.addEventListener('mouseup', endPos,false)
     canvas.addEventListener('mousemove',tool,false)
+    window.onresize = function(e){
+
+
+        
+         dim= window.innerWidth
+        //canvas.width =  wind*2
+        //canvas.height = wind*2
+         console.log('this is in the  resize: withis is::', dim)
+    }
 
 }
 
