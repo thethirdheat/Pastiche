@@ -57,7 +57,7 @@ onload=()=>{
         //totalPan[0]=totalPan[0]/scale
         //totalPan[1]=totalPan[1]/scale
         painting = false;
-        drawing.push([undefined,undefined,undefined,undefined])
+        drawing.push([undefined,undefined,undefined,undefined,undefined])
         if(zoomInTool){
             zoomIn()
         }
@@ -92,11 +92,14 @@ onload=()=>{
         //c.lineWidth=brushWidth*2
         let curBrushColor
         let curBrushWidth
+        let curRotation=deg
         for(let i =1;i < drawing.length;i++){
+            let curRotation = drawing[i][4]||deg
+            if(patternOn){
 
-            if(360%deg===0){
-                for(let j =0;j < 360/deg;j++ ){
-                c.rotate(deg * Math.PI / 180); // rotate canvas
+            if(360%curRotation===0){
+                for(let j =0;j < 360/curRotation;j++ ){
+                c.rotate(curRotation * Math.PI / 180); // rotate canvas
             curBrushColor = drawing[i][3]
             curBrushWidth = drawing[i][2]
 
@@ -119,13 +122,14 @@ onload=()=>{
             c.fill()
                 }
             }
+            }
         }
         //if(gridOn===true){
         if(gridOn){
             c.lineWidth=gridWidth
-            if(360%deg===0){
+            if(360%curRotation===0){
                 for(let j =0;j < 360/deg;j++ ){
-                c.rotate(deg * Math.PI / 180); // rotate canvas
+                c.rotate(curRotation * Math.PI / 180); // rotate canvas
             c.strokeStyle='black'
             c.beginPath();
             c.moveTo(-3000, 0);
@@ -153,6 +157,7 @@ onload=()=>{
     let zoomedOffset=[0,0]
     let zoomed=false
 
+    let patternOn=true
     const draw=(e)=>{
         if(!painting) return;
         if(!prevPos ){
@@ -163,6 +168,8 @@ onload=()=>{
         /*thi sis working */
         //drawing.push([...screenToWorld([e.clientX/scale,e.clientY/scale])])
         /*this */
+        if(patternOn){
+
         if(360%deg===0){
             for(let j =0;j < 360/deg;j++ ){
             c.rotate(deg * Math.PI / 180); // rotate canvas
@@ -183,7 +190,7 @@ onload=()=>{
         c.lineWidth=brushWidth*2
         //c.moveTo((prevPos[0]-center[0]+this.scrollX)*mult, (prevPos[1]-center[1]+this.scrollY)*mult)
         if(!drawing.length){
-            drawing.push([...screenToWorld([e.clientX+dim,e.clientY-dimY]),brushWidth,brushColor])
+            drawing.push([...screenToWorld([e.clientX+dim,e.clientY-dimY]),brushWidth,brushColor,deg])
         }
         c.moveTo(drawing[drawing.length-1][0], drawing[drawing.length-1][1])
         //c.lineTo((e.clientX-center[0]+this.scrollX)*mult, (e.clientY-center[1]+this.scrollY)*mult)
@@ -198,7 +205,8 @@ onload=()=>{
         c.fill()
             }
         }
-        drawing.push([...screenToWorld([e.clientX+dim,e.clientY-dimY]),brushWidth,brushColor])
+        }
+        drawing.push([...screenToWorld([e.clientX+dim,e.clientY-dimY]),brushWidth,brushColor,deg])
         if(gridOn){
             c.lineWidth=gridWidth
             if(360%deg===0){
@@ -454,7 +462,7 @@ onload=()=>{
                 holderArray.push(drawing.pop())
             }
         }else{
-            drawing=[[undefined,undefined,undefined,undefined]]
+            drawing=[[undefined,undefined,undefined,undefined,undefined]]
         }
         console.log(drawing[drawing.length-1])
         redoArray.push(holderArray)
@@ -465,6 +473,7 @@ onload=()=>{
 
     }
     let slider = document.getElementById("myRange");
+    let rotationSlider = document.getElementById("rotationSlider");
 
     let zoomInButton = document.getElementById("zoomIn");
 
@@ -473,7 +482,14 @@ onload=()=>{
     let panButton = document.getElementById("pan");
 
     let resetButton = document.getElementById("reset");
+    let drawButton = document.getElementById("drawTool");
 
+    drawButton.onclick = function(){
+        drawTool=true
+        panTool=false
+        zoomInTool=false
+
+    }
     gridHtml.onclick = function(){
         gridOn=!gridOn
         redraw()
@@ -499,9 +515,10 @@ onload=()=>{
     }
 
     panButton.onclick = function(){
-        panning=!panning
-        drawTool= !drawTool
-        panTool=!panTool
+        panning=true
+        drawTool= false
+        zoomInTool=false
+        panTool=true
     }
     //output.innerHTML = slider.value; // Display the default slider value
 
@@ -509,6 +526,24 @@ onload=()=>{
     slider.oninput = function() {
         //output.innerHTML = this.v        <button id="grids">Grid</button>alue;
         brushWidth=this.value
+    }
+    rotationSlider.oninput = function() {
+
+
+
+
+        let rotations=[30,60,180]
+        console.log(this.value)
+        let out = Math.floor(this.value/10)
+        deg= rotations[this.value%rotations.length]
+
+            c.translate(-totalPan[0],-totalPan[1])
+            totalPan=[0,0]
+            c.scale(1/scale,1/scale)
+            mult=1
+            scale=1
+
+        redraw()
     }
 
     canvas.addEventListener('mousedown', startPos,false)
