@@ -6,6 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Pastitch</title>
      <link rel = "stylesheet" type = "text/css" href = "style.css" />
+     <link href="https://fonts.googleapis.com/css?family=Pinyon+Script&display=swap" rel="stylesheet">
 
 </head>
 <body>
@@ -20,22 +21,39 @@
     
 
     <div class="palette">
-        <input type="color" id="html5colorpicker"   value="#ff0000" style="width:85%;" colorpick-eyedropper-active="true">
-
-        <div class="slidecontainer">
-            <input type="range" min=".1" max="10" value=".25" class="slider" id="myRange">
+        <h1 class="pastiche">Pastiche</h1>
+        <div class="sideBar">
+            <button id="undoButton">Undo</button>
+            <button id="redoButton">Redo</button>
+            <a id="download" download="image.png"><button type="button" >Save</button></a>
         </div>
 
-        <button id="drawTool">Draw Tool</button>
-        <button id="undoButton">Undo</button>
-        <button id="grids">Grid</button>
-        <button id="zoomIn">Zoom In</button>
-        <button id="pan">Pan</button>
-        <button id="reset">Reset</button>
+        <div class="toolBar">
 
-        <div class="slidecontainer">
-            <input type="range" min="1" max="100" value="30" class="slider" id="rotationSlider">
+
+            <div class="slidecontainer">
+                <p>Brush Size</p>
+                <input type="range" min=".1" max="10" value=".25" class="slider" id="myRange">
+            </div>
+
+            <button id="drawTool">Draw Tool</button>
+            <button id="grids">Grid</button>
+            <button id="zoomIn">Zoom In</button>
+            <button id="pan">Pan</button>
+            <button id="reset">Center</button>
+            <button id="reload">Reload</button>
+
+
+
+
+            <div class="slidecontainer">
+                <input type="range" min="1" max="100" value="30" class="slider" id="rotationSlider">
+            </div>
+
+
+            <input type="color" id="html5colorpicker"   value="#ff0000" style="width:100%;" colorpick-eyedropper-active="true">
         </div>
+
     </div>
 
     

@@ -7,7 +7,7 @@ onload=()=>{
     canvas.width =  dim*2
     canvas.height = dim*2
     const c = canvas.getContext('2d');
-    dim=-window.innerWidth/2-100
+    dim=-window.innerWidth/2-125
     dimY= window.innerHeight/2
 
 
@@ -125,7 +125,7 @@ onload=()=>{
             }
         }
         //if(gridOn===true){
-        if(gridOn){
+        if(gridOn && deg!==360){
             c.lineWidth=gridWidth
             if(360%curRotation===0){
                 for(let j =0;j < 360/deg;j++ ){
@@ -207,7 +207,7 @@ onload=()=>{
         }
         }
         drawing.push([...screenToWorld([e.clientX+dim,e.clientY-dimY]),brushWidth,brushColor,deg])
-        if(gridOn){
+        if(gridOn && deg!==360){
             c.lineWidth=gridWidth
             if(360%deg===0){
                 for(let j =0;j < 360/deg;j++ ){
@@ -450,7 +450,9 @@ onload=()=>{
     document.getElementById("html5colorpicker").onchange = change;
 
     document.getElementById("undoButton").onclick = undo;
+
     let redoArray=[]
+    document.getElementById("redoButton").onclick = redo;
 
 
     function undo(){
@@ -465,11 +467,21 @@ onload=()=>{
             drawing=[[undefined,undefined,undefined,undefined,undefined]]
         }
         console.log(drawing[drawing.length-1])
+        //drawing.push([undefined,undefined,undefined,undefined,undefined])
         redoArray.push(holderArray)
         redraw()
     }
 
     function redo(){
+        if(!redoArray.length){
+            return
+        }
+        last=redoArray.pop()
+        //drawing.push([undefined,undefined,undefined,undefined,undefined])
+        drawing.push(...last)
+        drawing.push([undefined,undefined,undefined,undefined,undefined])
+        //console.log(redoArray)
+        redraw()
 
     }
     let slider = document.getElementById("myRange");
@@ -484,6 +496,11 @@ onload=()=>{
     let resetButton = document.getElementById("reset");
     let drawButton = document.getElementById("drawTool");
 
+    let reloadButton = document.getElementById("reload");
+    reloadButton.onclick= function(){
+        location.reload()
+
+    }
     drawButton.onclick = function(){
         drawTool=true
         panTool=false
@@ -532,7 +549,7 @@ onload=()=>{
 
 
 
-        let rotations=[30,60,180]
+        let rotations=[360,30,60,180]
         console.log(this.value)
         let out = Math.floor(this.value/10)
         deg= rotations[this.value%rotations.length]
@@ -544,6 +561,19 @@ onload=()=>{
             scale=1
 
         redraw()
+    }
+
+    let downloadButton = document.getElementById("download");
+
+    downloadButton.onclick=function download(){
+        let download = document.getElementById("download");
+
+        //c.getImageData(0,0,1000,100).to
+
+        let image = document.getElementById("myCanvas").getImage.toDataURL("image/png")
+                    .replace("image/png", "image/octet-stream");
+        download.setAttribute("href", image);
+
     }
 
     canvas.addEventListener('mousedown', startPos,false)
