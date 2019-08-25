@@ -22,7 +22,7 @@ onload=()=>{
     //let boxes=[]
 
     let brushWidth=.25
-    let brushColor='green'
+    let brushColor='#ff0000'
     let gridWidth = 1
 
 
@@ -97,7 +97,7 @@ onload=()=>{
             let curRotation = drawing[i][4]||deg
             if(patternOn){
 
-            if(360%curRotation===0){
+            //if(360%curRotation===0){
                 for(let j =0;j < 360/curRotation;j++ ){
                 c.rotate(curRotation * Math.PI / 180); // rotate canvas
             curBrushColor = drawing[i][3]
@@ -121,16 +121,16 @@ onload=()=>{
             c.arc(curX,curY,curBrushWidth,0, Math.PI*2,false)
             c.fill()
                 }
-            }
+            //}
             }
         }
         //if(gridOn===true){
         if(gridOn && deg!==360){
-            c.lineWidth=gridWidth
+            c.lineWidth=gridWidth*(1/scale)
             if(360%curRotation===0){
                 for(let j =0;j < 360/deg;j++ ){
                 c.rotate(curRotation * Math.PI / 180); // rotate canvas
-            c.strokeStyle='black'
+            c.strokeStyle='purple'
             c.beginPath();
             c.moveTo(-3000, 0);
             c.lineTo( 3000,0);
@@ -158,6 +158,12 @@ onload=()=>{
     let zoomed=false
 
     let patternOn=true
+
+
+
+
+    /*This is the main drawing tool! */
+
     const draw=(e)=>{
         if(!painting) return;
         if(!prevPos ){
@@ -170,7 +176,7 @@ onload=()=>{
         /*this */
         if(patternOn){
 
-        if(360%deg===0){
+        //if(360%deg===0){
             for(let j =0;j < 360/deg;j++ ){
             c.rotate(deg * Math.PI / 180); // rotate canvas
 
@@ -204,15 +210,15 @@ onload=()=>{
         c.arc(...screenToWorld([e.clientX+dim,e.clientY-dimY]),brushWidth,0,Math.PI*2,false)
         c.fill()
             }
-        }
+        //}
         }
         drawing.push([...screenToWorld([e.clientX+dim,e.clientY-dimY]),brushWidth,brushColor,deg])
         if(gridOn && deg!==360){
-            c.lineWidth=gridWidth
+            c.lineWidth=gridWidth*(1/scale)
             if(360%deg===0){
                 for(let j =0;j < 360/deg;j++ ){
                 c.rotate(deg * Math.PI / 180); // rotate canvas
-            c.strokeStyle='black'
+            c.strokeStyle='purple'
             c.beginPath();
             c.moveTo(-3000, 0);
             c.lineTo( 3000,0);
@@ -239,6 +245,7 @@ onload=()=>{
             draw(e)
         }else if(panTool){
             pan(e)
+            //window.requestAnimationFrame(redraw)
             redraw()
         }
 
@@ -308,6 +315,7 @@ onload=()=>{
             //totalPan[0]-=zoomedOffset[0]
             //totalPan[1]-=zoomedOffset[1]
             //console.log(mult)
+            //window.requestAnimationFrame(redraw)
             redraw()
 
     }
@@ -360,6 +368,7 @@ onload=()=>{
 
 
 
+            //window.requestAnimationFrame(redraw)
             redraw()
         }else if(e.key==='g'){
             mult-=.1
@@ -408,6 +417,7 @@ onload=()=>{
 
 
 
+            //window.requestAnimationFrame(redraw)
             redraw()
 
         }else if(e.key==='z'){
@@ -417,6 +427,7 @@ onload=()=>{
             mult=1
             scale=1
 
+            //window.requestAnimationFrame(redraw)
             redraw()
         }
 
@@ -440,12 +451,41 @@ onload=()=>{
         }
 
     })
+
+    /* 
+    elem.style.backgroundColor = '#e5e5e5';
+    */
+
+    colorsContainer=document.getElementById("colorButtons")
+    let lastHolder= document.getElementById("emptyHolder")
+
     function change(e){
         brushColor=this.value
         console.log(this.value)
         //color = this.value;
+        let col=this.value
+        let butt  = document.createElement("BUTTON");
+        butt.style.backgroundColor=this.value
+        butt.style.width="25%"
+
+        butt.onclick=function(){
+            console.log(col)
+            colorsContainer.removeChild(this)
+            colorsContainer.insertBefore(this,lastHolder)
+            lastHolder=this
+
+            brushColor=col
+        }
+
+        colorsContainer.insertBefore(butt,lastHolder)
+        lastHolder=butt
+        //colorsContainer.appendChild(butt)
+        //butt.innerHTML="fuck"
+
 
     }
+
+
 
     document.getElementById("html5colorpicker").onchange = change;
 
@@ -469,6 +509,7 @@ onload=()=>{
         console.log(drawing[drawing.length-1])
         //drawing.push([undefined,undefined,undefined,undefined,undefined])
         redoArray.push(holderArray)
+        //window.requestAnimationFrame(redraw)
         redraw()
     }
 
@@ -481,6 +522,7 @@ onload=()=>{
         drawing.push(...last)
         drawing.push([undefined,undefined,undefined,undefined,undefined])
         //console.log(redoArray)
+        //window.requestAnimationFrame(redraw)
         redraw()
 
     }
@@ -494,21 +536,72 @@ onload=()=>{
     let panButton = document.getElementById("pan");
 
     let resetButton = document.getElementById("reset");
-    let drawButton = document.getElementById("drawTool");
+    let drawButton = document.getElementById("drawingTool");
 
     let reloadButton = document.getElementById("reload");
+    let eraseButton = document.getElementById("eraser");
+
+    let holdBursh=""
+    let eraseOn=false
+
+
+
+    eraseButton.onclick=function(){
+        eraseOn=true
+        drawTool=true
+        panTool=false
+        zoomInTool=false
+        zoomInButton.classList=""
+        panButton.classList=""
+
+        if(eraseOn){
+            holdBursh=brushColor
+            brushColor='white'
+            eraseButton.className = "buttonOn";
+            drawButton.classList=""
+
+        }else{
+            brushColor=holdBursh
+            holdBursh=""
+            eraseButton.className = "";
+            drawButton.classList="buttonOn"
+
+        }
+
+    }
+
     reloadButton.onclick= function(){
         location.reload()
 
     }
+
     drawButton.onclick = function(){
+
         drawTool=true
         panTool=false
         zoomInTool=false
 
+        drawButton.classList="buttonOn"
+        zoomInButton.classList=""
+        panButton.classList=""
+        eraseButton.classList=""
+
+        if(holdBursh){
+            brushColor=holdBursh
+            holdBursh=""
+        }else{
+            brushColor='green'
+        }
+
     }
     gridHtml.onclick = function(){
         gridOn=!gridOn
+        if(gridOn){
+            gridHtml.classList="buttonOn"
+        }else{
+            gridHtml.classList=""
+        }
+        //window.requestAnimationFrame(redraw)
         redraw()
     }
     resetButton.onclick=function(){
@@ -518,24 +611,79 @@ onload=()=>{
         mult=1
         scale=1
 
+
+        //window.requestAnimationFrame(redraw)
         redraw()
 
     }
 
     zoomInButton.onclick=function(){
-        console.log('draw should be fales')
-        drawTool=false
-        panTool=false
         zoomInTool=!zoomInTool
+        if(zoomInTool){
+
+            drawTool=false
+            panTool=false
+
+            drawButton.classList=""
+            zoomInButton.classList="buttonOn"
+            panButton.classList=""
+
+        }else{
+            drawTool=true
+            panTool=false
+
+            drawButton.classList="buttonOn"
+            zoomInButton.classList=""
+            panButton.classList=""
+        }
 
 
     }
 
+    let rot0Button = document.getElementById("rot0");
+    rot0Button.onclick = function(){
+        console.log(deg, "whey won't htis show??")
+        console.log(deg)
+        deg=360
+        redraw()
+    }
+
+    let rot30Button = document.getElementById("rot30");
+
+    rot30Button.onclick = function(){
+        deg=30
+        redraw()
+    }
+
+    let rot360Button = document.getElementById("rot360");
+    document.getElementById
+
+
+
+
+    rot360Button.onclick = function(){
+        deg=1
+        redraw()
+    }
     panButton.onclick = function(){
-        panning=true
-        drawTool= false
-        zoomInTool=false
-        panTool=true
+        panning=!panning
+        if(panning){
+            drawTool= false
+            zoomInTool=false
+            panTool=true
+            drawButton.classList=""
+            zoomInButton.classList=""
+            panButton.classList="buttonOn"
+        }else{
+            drawTool= true
+            zoomInTool=false
+            panTool=false
+            drawButton.classList="buttonOn"
+            zoomInButton.classList=""
+            panButton.classList=""
+
+        }
+
     }
     //output.innerHTML = slider.value; // Display the default slider value
 
@@ -544,41 +692,45 @@ onload=()=>{
         //output.innerHTML = this.v        <button id="grids">Grid</button>alue;
         brushWidth=this.value
     }
+
     rotationSlider.oninput = function() {
 
+        let rotations=[[360,0],[180,2],[120,3],[90,4],[72,5],[60,6],[45,8],[40,9],[36,10],[30,12],[24,15],[20,18],[18,20],[15,24],[12,30],[10,36],[9,40],[8,45],[6,60],[5,72],[4,90],[3,120],[2,180],[1,360]]
 
 
 
-        let rotations=[360,30,60,180]
+        //let rotations=[360,30,60,180]
         console.log(this.value)
-        let out = Math.floor(this.value/10)
-        deg= rotations[this.value%rotations.length]
+        deg= rotations[this.value][0]
 
-            c.translate(-totalPan[0],-totalPan[1])
-            totalPan=[0,0]
-            c.scale(1/scale,1/scale)
-            mult=1
-            scale=1
+        c.translate(-totalPan[0],-totalPan[1])
+        totalPan=[0,0]
+        c.scale(1/scale,1/scale)
+        mult=1
+        scale=1
 
+        //window.requestAnimationFrame(redraw)
         redraw()
     }
 
-    let downloadButton = document.getElementById("download");
-
-    downloadButton.onclick=function download(){
-        let download = document.getElementById("download");
-
-        //c.getImageData(0,0,1000,100).to
-
-        let image = document.getElementById("myCanvas").getImage.toDataURL("image/png")
-                    .replace("image/png", "image/octet-stream");
-        download.setAttribute("href", image);
-
-    }
-
+//    let downloadButton = document.getElementById("download");
+//
+//    downloadButton.onclick=function download(){
+//        let download = document.getElementById("download");
+//
+//        //c.getImageData(0,0,1000,100).to
+//
+//        let image = document.getElementById("myCanvas").getImage.toDataURL("image/png")
+//                    .replace("image/png", "image/octet-stream");
+//        download.setAttribute("href", image);
+//
+//    }
+//
     canvas.addEventListener('mousedown', startPos,false)
     canvas.addEventListener('mouseup', endPos,false)
     canvas.addEventListener('mousemove',tool,false)
+
+    canvas.addEventListener('mouseleave',endPos,false)
 
     window.onresize = function(e){
 
@@ -589,6 +741,7 @@ onload=()=>{
         //canvas.height = wind*2
          console.log('this is in the  resize: withis is::', dim)
     }
+    //window.requestAnimationFrame(redraw)
     redraw()
 
 }
