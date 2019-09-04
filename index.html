@@ -32,43 +32,33 @@
         <div class="toolBar">
 
 
+
+            <button id="reset">Center</button>
+            <button id="drawingTool" class="buttonOn">Draw Tool</button>
+            <button id="grids" class="buttonOn">Grid</button>
+            <button id="zoomIn">Zoom In</button>
+            <button id="pan">Pan</button>
+            <button id="eraser">Erase</button>
+
             <div class="slidecontainer">
                 <p>Brush Size</p>
                 <input type="range" min=".1" max="10" value=".25" class="slider" id="myRange">
             </div>
 
-            <button id="drawingTool" class="buttonOn">Draw Tool</button>
-            <button id="grids" class="buttonOn">Grid</button>
-            <button id="zoomIn">Zoom In</button>
-            <button id="pan">Pan</button>
-            <button id="reset">Center</button>
-            <button id="eraser">Erase</button>
-
-
 
 
             <div class="slidecontainer">
-                <p>Revolutions</p>
+                <p>Revolutions <span id="revValue"></span></p>
                 <input type="range" min="0" max="23" value="3" class="slider" id="rotationSlider">
             </div>
-            <div class="rotation--buttons">
-                <button id="rot0">0</button>
-                <button id="rot30">30</button>
-                <button id="rot60">60</button>
-                <button id="rot180">180</button>
-                <button id="rot360">360</button>
 
-                <button id="rot0">0</button>
-                <button id="rot30">30</button>
-                <button id="rot60">60</button>
-                <button id="rot180">180</button>
-                <button id="rot360">360</button>
-            </div>
+
 
 
             <input type="color" id="html5colorpicker"   value="#ff0000" style="width:100%;" colorpick-eyedropper-active="true">
             <div id="colorButtons">
                 <div id='emptyHolder'></div>
+            </div>
             </div>
         </div>
 
@@ -87,3 +77,16 @@
 </body>
 </html>
     <!-- <input type="color" id="html5colorpicker" onchange="clickColor(0, -1, -1, 5)" value="#ff0000" style="width:85%;" colorpick-eyedropper-active="true"> -->
+            <!-- <div class="rotation--buttons" > -->
+                <!-- <button id="rot0">0</button> -->
+                <!-- <button id="rot30">30</button> -->
+                <!-- <button id="rot60">60</button> -->
+                <!-- <button id="rot180">180</button> -->
+                <!-- <button id="rot360">360</button> -->
+<!--  -->
+                <!-- <button id="rot0">0</button> -->
+                <!-- <button id="rot30">30</button> -->
+                <!-- <button id="rot60">60</button> -->
+                <!-- <button id="rot180">180</button> -->
+                <!-- <button id="rot360">360</button> -->
+            <!-- </div> -->

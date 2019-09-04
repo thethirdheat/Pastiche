@@ -246,7 +246,8 @@ onload=()=>{
         }else if(panTool){
             pan(e)
             //window.requestAnimationFrame(redraw)
-            redraw()
+        setTimeout( redraw,0)
+            //redraw()
         }
 
     }
@@ -316,7 +317,8 @@ onload=()=>{
             //totalPan[1]-=zoomedOffset[1]
             //console.log(mult)
             //window.requestAnimationFrame(redraw)
-            redraw()
+        setTimeout( redraw,0)
+            //redraw()
 
     }
 
@@ -369,7 +371,8 @@ onload=()=>{
 
 
             //window.requestAnimationFrame(redraw)
-            redraw()
+        setTimeout( redraw,0)
+            //redraw()
         }else if(e.key==='g'){
             mult-=.1
 //            c.translate(-totalPan[0],-totalPan[1])
@@ -418,7 +421,8 @@ onload=()=>{
 
 
             //window.requestAnimationFrame(redraw)
-            redraw()
+            //redraw()
+        setTimeout( redraw,0)
 
         }else if(e.key==='z'){
             c.translate(-totalPan[0],-totalPan[1])
@@ -428,7 +432,8 @@ onload=()=>{
             scale=1
 
             //window.requestAnimationFrame(redraw)
-            redraw()
+            //redraw()
+        setTimeout( redraw,0)
         }
 
         if(e.key===" "){
@@ -510,7 +515,8 @@ onload=()=>{
         //drawing.push([undefined,undefined,undefined,undefined,undefined])
         redoArray.push(holderArray)
         //window.requestAnimationFrame(redraw)
-        redraw()
+        //redraw()
+        setTimeout( redraw,0)
     }
 
     function redo(){
@@ -523,7 +529,8 @@ onload=()=>{
         drawing.push([undefined,undefined,undefined,undefined,undefined])
         //console.log(redoArray)
         //window.requestAnimationFrame(redraw)
-        redraw()
+        //redraw()
+        setTimeout( redraw,0)
 
     }
     let slider = document.getElementById("myRange");
@@ -602,7 +609,8 @@ onload=()=>{
             gridHtml.classList=""
         }
         //window.requestAnimationFrame(redraw)
-        redraw()
+        //redraw()
+        setTimeout( redraw,0)
     }
     resetButton.onclick=function(){
         c.translate(-totalPan[0],-totalPan[1])
@@ -613,7 +621,8 @@ onload=()=>{
 
 
         //window.requestAnimationFrame(redraw)
-        redraw()
+        //redraw()
+        setTimeout( redraw,0)
 
     }
 
@@ -640,31 +649,35 @@ onload=()=>{
 
     }
 
-    let rot0Button = document.getElementById("rot0");
-    rot0Button.onclick = function(){
-        console.log(deg, "whey won't htis show??")
-        console.log(deg)
-        deg=360
-        redraw()
-    }
-
-    let rot30Button = document.getElementById("rot30");
-
-    rot30Button.onclick = function(){
-        deg=30
-        redraw()
-    }
-
-    let rot360Button = document.getElementById("rot360");
-    document.getElementById
-
-
-
-
-    rot360Button.onclick = function(){
-        deg=1
-        redraw()
-    }
+//    let rot0Button = document.getElementById("rot0");
+//    rot0Button.onclick = function(){
+//        console.log(deg, "whey won't htis show??")
+//        console.log(deg)
+//        deg=360
+//        //redraw()
+//        setTimeout( redraw,0)
+//    }
+//
+//    let rot30Button = document.getElementById("rot30");
+//
+//    rot30Button.onclick = function(){
+//        deg=30
+//        //redraw()
+//        setTimeout( redraw,0)
+//    }
+//
+//    let rot360Button = document.getElementById("rot360");
+//    document.getElementById
+//    let rot360Button = document.getElementById("rot360");
+//
+//
+//
+//
+//    rot360Button.onclick = function(){
+//        deg=1
+//        //redraw()
+//        setTimeout( redraw,0)
+//    }
     panButton.onclick = function(){
         panning=!panning
         if(panning){
@@ -686,6 +699,10 @@ onload=()=>{
 
     }
     //output.innerHTML = slider.value; // Display the default slider value
+    revVal=document.getElementById('revValue')
+    revVal.innerHTML=12
+    rotationSlider.oninput = function() {
+
 
     // Update the current slider value (each time you drag the slider handle)
     slider.oninput = function() {
@@ -693,15 +710,29 @@ onload=()=>{
         brushWidth=this.value
     }
 
-    rotationSlider.oninput = function() {
+//        let rotations=[[360,0],[180,2],[120,3],[90,4],[72,5],[60,6],[45,8],[40,9],[36,10],[30,12],[24,15],[20,18],[18,20],[15,24],[12,30],[10,36],[9,40],[8,45],[6,60],[5,72],[4,90],[3,120],[2,180],[1,360]]
+//        let rotContainer=document.getElementById('rotation--buttons__container')
+//        for(let i =0;i < rotations.length;i++){
+//            cur  = document.createElement("BUTTON");
+//            cur.innerHTML =rotations[i][1].toString()
+//            rotContainer.appendChild(cur)
+//        }
 
-        let rotations=[[360,0],[180,2],[120,3],[90,4],[72,5],[60,6],[45,8],[40,9],[36,10],[30,12],[24,15],[20,18],[18,20],[15,24],[12,30],[10,36],[9,40],[8,45],[6,60],[5,72],[4,90],[3,120],[2,180],[1,360]]
 
+        let rotations=[[360,0],[180,2],[90,4],[120,6],[60,6],[72,5],,[45,8],[40,9],[36,10],[30,12],[24,15],[20,18],[18,20],[15,24],[12,30],[10,36],[9,40],[8,45],[6,60],[5,72],[4,90],[3,120],[2,180],[1,360]]
 
+        //colorsContainer.insertBefore(this,lastHolder)
+//        for(let i =0;i < rotations.length;i++){
+//            cur  = document.createElement("BUTTON");
+//            cur.innerHTML =rotations[i][1].toString()
+//            rotContainer.appendChild(cur)
+//        }
 
         //let rotations=[360,30,60,180]
+        setTimeout( redraw,0)
         console.log(this.value)
         deg= rotations[this.value][0]
+        revVal.innerHTML= rotations[this.value][1]
 
         c.translate(-totalPan[0],-totalPan[1])
         totalPan=[0,0]
@@ -710,7 +741,7 @@ onload=()=>{
         scale=1
 
         //window.requestAnimationFrame(redraw)
-        redraw()
+        setTimeout( redraw,0)
     }
 
 //    let downloadButton = document.getElementById("download");
@@ -742,7 +773,8 @@ onload=()=>{
          console.log('this is in the  resize: withis is::', dim)
     }
     //window.requestAnimationFrame(redraw)
-    redraw()
+        setTimeout( redraw,0)
+    //redraw()
 
 }
 
