@@ -7,6 +7,7 @@
     <title>Pastitch</title>
      <link rel = "stylesheet" type = "text/css" href = "style.css" />
      <link href="https://fonts.googleapis.com/css?family=Pinyon+Script&display=swap" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/c0529a9e2b.js"></script>
 
 </head>
 <body>
@@ -23,9 +24,9 @@
     <div class="palette">
         <h1 class="pastiche">Pastiche</h1>
         <div class="sideBar">
-            <button id="undoButton" class="sideButton">Undo</button>
-            <button id="redoButton" class="sideButton">Redo</button>
-            <button id="reload" class="sideButton">Reload</button>
+            <button id="undoButton" class="sideButton"><i class="fas fa-undo"></i>&nbsp;Undo</button>
+            <button id="redoButton" class="sideButton"><i class="fas fa-redo"></i>&nbsp;Redo</button>
+            <button id="reload" class="sideButton"><i class="fas fa-sync-alt"></i>&nbsp;Reload</button>
             <!-- <a id="download" download="image.png"><button type="button" class="sideButton" >Save</button></a> -->
         </div>
 
@@ -33,22 +34,22 @@
 
 
 
-            <button id="reset">Center</button>
-            <button id="drawingTool" class="buttonOn">Draw Tool</button>
-            <button id="grids" class="buttonOn">Grid</button>
-            <button id="zoomIn">Zoom In</button>
-            <button id="pan">Pan</button>
-            <button id="eraser">Erase</button>
+            <button id="reset"><i class="fas fa-crosshairs"></i>&nbsp;&nbsp;Center</button>
+            <button id="drawingTool" class="buttonOn"><i class="fas fa-paint-brush"></i>&nbsp;&nbsp;Draw Tool</button>
+            <button id="grids" class="buttonOn"><i class="fas fa-border-none"></i>&nbsp;&nbsp;Grid</button>
+            <button id="zoomIn"><i class="fas fa-search-plus"></i>&nbsp;&nbsp;Zoom In</button>
+            <button id="pan"><i class="fas fa-expand"></i></i>&nbsp;&nbsp;Pan</button>
+            <button id="eraser"><i class="fas fa-eraser"></i>&nbsp;&nbsp;Erase</button>
 
             <div class="slidecontainer">
-                <p>Brush Size</p>
+                <p>Brush Size: <span id="brushValue">?</span></p>
                 <input type="range" min=".1" max="10" value=".25" class="slider" id="myRange">
             </div>
 
 
 
             <div class="slidecontainer">
-                <p>Revolutions <span id="revValue"></span></p>
+                <p>Revolutions: <span id="revValue"></span></p>
                 <input type="range" min="0" max="23" value="3" class="slider" id="rotationSlider">
             </div>
 

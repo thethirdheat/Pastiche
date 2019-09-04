@@ -699,16 +699,25 @@ onload=()=>{
 
     }
     //output.innerHTML = slider.value; // Display the default slider value
-    revVal=document.getElementById('revValue')
+    let revVal=document.getElementById('revValue')
     revVal.innerHTML=12
-    rotationSlider.oninput = function() {
 
 
+
+    let brshVal = document.getElementById('brushValue')
+    brshVal.innerHTML=brushWidth
     // Update the current slider value (each time you drag the slider handle)
     slider.oninput = function() {
         //output.innerHTML = this.v        <button id="grids">Grid</button>alue;
         brushWidth=this.value
+        brshVal.innerHTML=brushWidth
     }
+    
+
+
+    rotationSlider.oninput = function() {
+
+
 
 //        let rotations=[[360,0],[180,2],[120,3],[90,4],[72,5],[60,6],[45,8],[40,9],[36,10],[30,12],[24,15],[20,18],[18,20],[15,24],[12,30],[10,36],[9,40],[8,45],[6,60],[5,72],[4,90],[3,120],[2,180],[1,360]]
 //        let rotContainer=document.getElementById('rotation--buttons__container')
